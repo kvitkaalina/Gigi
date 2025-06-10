@@ -55,7 +55,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
           className={styles.newChatButton}
           onClick={() => setIsSearching(true)}
         >
-          New Message
+          <i className="fas fa-plus"></i>
         </button>
       </div>
 
@@ -72,7 +72,6 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
             >
               Back
             </button>
-            <h3>New Message</h3>
           </div>
           <div className={styles.searchInputContainer}>
             <input

@@ -10,18 +10,61 @@
 }
 
 .container {
-  background-color: white;
-  border: 1px solid #dbdbdb;
-  border-radius: 3px;
-  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.createPostCard {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(58, 94, 99, 0.08);
+  border: 1px solid rgba(70, 117, 109, 0.1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #46756d;
+  transition: all 0.3s ease;
+  margin-right: 16px;
+}
+
+.backButton:hover {
+  color: #3a5e63;
+  transform: translateX(-2px);
 }
 
 .title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
-  color: #262626;
-  margin-bottom: 20px;
-  text-align: center;
+  margin: 0;
+  position: relative;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  border-radius: 2px;
 }
 
 .form {
@@ -38,55 +81,63 @@
   overflow: hidden;
 }
 
-.preview {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.uploadOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+.uploadArea {
+  border: 2px dashed rgba(58, 94, 99, 0.2);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 24px;
+  background: rgba(58, 94, 99, 0.02);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  min-height: 300px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
-  opacity: 0;
-  transition: opacity 0.2s;
 }
 
-.uploadOverlay:hover {
-  opacity: 1;
+.uploadArea:hover {
+  border-color: rgba(58, 94, 99, 0.4);
+  background: rgba(58, 94, 99, 0.04);
 }
 
-.uploadOverlay i {
-  font-size: 32px;
-  margin-bottom: 8px;
+.uploadIcon {
+  font-size: 48px;
+  color: #46756d;
+  margin-bottom: 16px;
 }
 
-.fileInput {
-  display: none;
+.uploadText {
+  color: #46756d;
+  font-size: 16px;
+  margin: 0;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .caption {
   width: 100%;
-  min-height: 100px;
-  padding: 12px;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
+  padding: 16px;
+  border: 2px solid rgba(58, 94, 99, 0.1);
+  border-radius: 12px;
+  font-size: 15px;
+  margin: 24px 0;
   resize: vertical;
-  font-size: 14px;
-  line-height: 1.5;
+  min-height: 100px;
+  background: white;
+  transition: all 0.3s ease;
 }
 
 .caption:focus {
   outline: none;
-  border-color: #a8a8a8;
+  border-color: #46756d;
+  box-shadow: 0 0 0 4px rgba(70, 117, 109, 0.1);
 }
 
 .error {
@@ -95,23 +146,52 @@
   text-align: center;
 }
 
-.submitButton {
-  background-color: #0095f6;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
+.shareButton {
   width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(58, 94, 99, 0.2);
 }
 
-.submitButton:disabled {
-  background-color: #b2dffc;
+.shareButton:hover {
+  background: linear-gradient(45deg, #2c484c, #385c55);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(58, 94, 99, 0.3);
+}
+
+.shareButton:disabled {
+  background: #cccccc;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.submitButton:hover:not(:disabled) {
-  background-color: #0081d6;
+@media (max-width: 768px) {
+  .container {
+    margin: 20px auto;
+  }
+
+  .createPostCard {
+    padding: 24px;
+  }
+
+  .uploadArea {
+    padding: 24px;
+    min-height: 200px;
+  }
+
+  .uploadIcon {
+    font-size: 36px;
+  }
+
+  .uploadText {
+    font-size: 14px;
+  }
 } 

@@ -135,7 +135,7 @@ const Sidebar: React.FC = () => {
           <li>
             <button 
               onClick={handleLogout}
-              className={styles.navItem}
+              className={`${styles.navItem} ${styles.logoutButton}`}
             >
               <span className={styles.icon}>
                 <svg aria-label="Logout" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">

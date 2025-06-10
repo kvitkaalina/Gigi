@@ -7,9 +7,9 @@
 }
 
 .header {
-  padding: 16px;
+  padding: 20px;
   width: 100%;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #dbdbdb;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -17,24 +17,47 @@
 }
 
 .header h2 {
-  font-size: 16px;
-  font-weight: 500;
-  color: #262626;
+  font-size: 20px;
+  font-weight: 600;
   margin: 0;
+  position: relative;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  border-radius: 2px;
 }
 
 .newChatButton {
-  background: none;
-  color: #666666;
+  width: 24px;
+  height: 24px;
   border: none;
-  padding: 8px;
-  font-weight: 500;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(58, 94, 99, 0.15);
 }
 
 .newChatButton:hover {
-  color: #262626;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(58, 94, 99, 0.2);
+  background: linear-gradient(45deg, #2c484c, #385c55);
 }
 
 .searchContainer {

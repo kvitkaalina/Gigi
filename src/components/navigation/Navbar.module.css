@@ -97,9 +97,25 @@
 }
 
 .searchModalHeader h2 {
-  margin: 0;
   font-size: 20px;
-  color: #262626;
+  font-weight: 600;
+  margin: 0;
+  position: relative;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.searchModalHeader h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(45deg, #3a5e63, #46756d);
+  border-radius: 2px;
 }
 
 .closeButton {

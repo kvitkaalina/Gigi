@@ -1,106 +1,120 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/navigation/Navbar';
 import styles from './CreatePost.module.css';
-import defaultPost from '../assets/default-post.svg';
-import { postService } from '../services';
 
 const CreatePost: React.FC = () => {
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>(defaultPost);
+  const [preview, setPreview] = useState<string>('');
   const [caption, setCaption] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate(-1); // Возвращаемся на предыдущую страницу
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setError('Image size should be less than 5MB');
-        return;
-      }
       setImage(file);
-      setPreview(URL.createObjectURL(file));
-      setError('');
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!image) {
-      setError('Please select an image');
-      return;
-    }
+    if (!image) return;
 
-    setLoading(true);
-    setError('');
-
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append('image', image);
       formData.append('caption', caption);
 
-      await postService.createPost(formData);
-      navigate('/');
-    } catch (err) {
-      setError('Failed to create post. Please try again.');
-      console.error('Error creating post:', err);
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        navigate('/');
+      } else {
+        throw new Error('Failed to create post');
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className={styles.createPost}>
-      <Navbar />
-      <main className={styles.main}>
-        <div className={styles.container}>
+    <div className={styles.container}>
+      <div className={styles.createPostCard}>
+        <div className={styles.header}>
+          <button onClick={handleBack} className={styles.backButton}>
+            ← Back
+          </button>
           <h1 className={styles.title}>Create New Post</h1>
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div 
-              className={styles.imageUpload}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <img 
-                src={preview} 
-                alt="Preview" 
-                className={styles.preview}
-              />
-              <div className={styles.uploadOverlay}>
-                <i className="fas fa-camera"></i>
-                <span>Click to upload image</span>
-              </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                accept="image/*"
-                className={styles.fileInput}
-              />
-            </div>
-
-            <textarea
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Write a caption..."
-              className={styles.caption}
-              maxLength={2200}
-            />
-
-            {error && <div className={styles.error}>{error}</div>}
-
-            <button 
-              type="submit" 
-              className={styles.submitButton}
-              disabled={loading || !image}
-            >
-              {loading ? 'Creating...' : 'Share'}
-            </button>
-          </form>
         </div>
-      </main>
+        <form onSubmit={handleSubmit}>
+          <div
+            className={styles.uploadArea}
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {preview ? (
+              <img src={preview} alt="Preview" className={styles.previewImage} />
+            ) : (
+              <div>
+                <span className={styles.uploadIcon}>📷</span>
+                <p className={styles.uploadText}>
+                  Drag and drop your image here, or click to select
+                </p>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+            />
+          </div>
+          <textarea
+            className={styles.caption}
+            placeholder="Write a caption..."
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
+          <button
+            className={styles.shareButton}
+            type="submit"
+            disabled={!image || isSubmitting}
+          >
+            {isSubmitting ? 'Sharing...' : 'Share Post'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

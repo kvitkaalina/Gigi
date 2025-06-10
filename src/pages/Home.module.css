@@ -6,7 +6,7 @@
 
 .content {
   flex: 1;
-  padding: 20px;
+  padding: 42px;
   max-width: calc(100% - 245px);
 }
 

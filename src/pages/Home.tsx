@@ -49,16 +49,18 @@ const Home: React.FC = () => {
   const [activeCommentForm, setActiveCommentForm] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isPreloading, setIsPreloading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPostRef = useRef<HTMLDivElement | null>(null);
-  const POSTS_PER_PAGE = 5;
-  const INITIAL_COMMENTS_SHOW = 2;
+  const POSTS_PER_PAGE = 10;
+  const PRELOAD_THRESHOLD = 0.5;
   const navigate = useNavigate();
 
-  const fetchPosts = useCallback(async (pageNum: number = 1) => {
+  const fetchPosts = useCallback(async (pageNum: number = 1, isPreload: boolean = false) => {
     try {
-      console.log('Fetching posts for page:', pageNum);
-      setLoading(true);
+      if (!isPreload) {
+        setLoading(true);
+      }
       const token = localStorage.getItem('token');
       
       if (!token) {
@@ -75,59 +77,68 @@ const Home: React.FC = () => {
       );
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to fetch posts');
+        throw new Error('Failed to fetch posts');
       }
 
       const data = await response.json();
-      console.log('Received data:', data);
       
-      // Обновляем посты
-      if (pageNum === 1) {
-        setPosts(data.posts);
+      if (!isPreload) {
+        if (pageNum === 1) {
+          setPosts(data.posts);
+        } else {
+          setPosts(prev => [...prev, ...data.posts]);
+        }
       } else {
-        setPosts(prev => [...prev, ...data.posts]);
+        sessionStorage.setItem(`posts_page_${pageNum}`, JSON.stringify(data.posts));
       }
 
-      // Используем hasMore из ответа сервера
       setHasMore(data.hasMore);
       
-      console.log('Posts fetch status:', {
-        currentPage: data.currentPage,
-        totalPages: data.totalPages,
-        receivedPosts: data.posts.length,
-        hasMore: data.hasMore
-      });
+      if (data.hasMore && !isPreload) {
+        preloadNextPage(pageNum + 1);
+      }
 
-      // Проверяем лайки
-      data.posts.forEach((post: Post) => {
-        checkUserLike(post._id);
-      });
     } catch (err) {
       console.error('Error fetching posts:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load posts');
-      setHasMore(false);
-      
-      if (err instanceof Error && err.message.includes('token')) {
-        window.location.href = '/login';
+      if (!isPreload) {
+        setError(err instanceof Error ? err.message : 'Failed to load posts');
+        setHasMore(false);
       }
     } finally {
-      setLoading(false);
+      if (!isPreload) {
+        setLoading(false);
+      }
     }
   }, []);
 
-  // Intersection Observer setup
+  const preloadNextPage = useCallback(async (nextPage: number) => {
+    if (!isPreloading) {
+      setIsPreloading(true);
+      await fetchPosts(nextPage, true);
+      setIsPreloading(false);
+    }
+  }, [fetchPosts, isPreloading]);
+
   useEffect(() => {
     const options = {
       root: null,
-      rootMargin: '20px',
-      threshold: 1.0
+      rootMargin: '100px',
+      threshold: PRELOAD_THRESHOLD
     };
 
     observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore && !loading) {
-        console.log('Loading next page:', page + 1);
-        setPage(prev => prev + 1);
+      const firstEntry = entries[0];
+      if (firstEntry.isIntersecting && hasMore && !loading && !isPreloading) {
+        const nextPage = page + 1;
+        const cachedData = sessionStorage.getItem(`posts_page_${nextPage}`);
+        if (cachedData) {
+          setPosts(prev => [...prev, ...JSON.parse(cachedData)]);
+          sessionStorage.removeItem(`posts_page_${nextPage}`);
+          setPage(nextPage);
+        } else {
+          setPage(nextPage);
+          fetchPosts(nextPage);
+        }
       }
     }, options);
 
@@ -140,7 +151,7 @@ const Home: React.FC = () => {
         observer.current.disconnect();
       }
     };
-  }, [hasMore, loading, page]);
+  }, [hasMore, loading, page, fetchPosts, isPreloading]);
 
   useEffect(() => {
     fetchPosts(1);
@@ -162,6 +173,15 @@ const Home: React.FC = () => {
     });
   }, [posts.length, loading, hasMore, error, page]);
 
+  useEffect(() => {
+    console.log('EndOfFeed conditions:', {
+      loading,
+      hasMore,
+      postsLength: posts.length,
+      shouldShow: !loading && !hasMore && posts.length > 0
+    });
+  }, [loading, hasMore, posts.length]);
+
   const checkUserLike = async (postId: string) => {
     try {
       const response = await fetch(`http://localhost:5001/api/likes/${postId}/check`, {
@@ -173,7 +193,6 @@ const Home: React.FC = () => {
       if (response.ok) {
         const { hasLiked, likesCount } = await response.json();
         setUserLikes(prev => ({ ...prev, [postId]: hasLiked }));
-        // Обновляем количество лайков в посте
         setPosts(prevPosts => 
           prevPosts.map(post => {
             if (post._id === postId) {
@@ -204,7 +223,6 @@ const Home: React.FC = () => {
       const { hasLiked } = await response.json();
       setUserLikes(prev => ({ ...prev, [postId]: hasLiked }));
       
-      // После успешного переключения лайка, обновляем информацию о лайках
       checkUserLike(postId);
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -248,7 +266,6 @@ const Home: React.FC = () => {
 
       const newComment = JSON.parse(responseText);
 
-      // Обновляем состояние локально
       setPosts(prevPosts => 
         prevPosts.map(post => {
           if (post._id === postId) {
@@ -261,7 +278,6 @@ const Home: React.FC = () => {
         })
       );
 
-      // Очищаем поле ввода, закрываем форму и сворачиваем комментарии
       setNewComments(prev => ({
         ...prev,
         [postId]: ''
@@ -289,7 +305,6 @@ const Home: React.FC = () => {
         throw new Error('No authorization token found');
       }
 
-      // Используем правильный URL для удаления комментария
       const url = `http://localhost:5001/api/posts/${postId}/comments/${commentId}`;
       console.log('Delete URL:', url);
 
@@ -314,7 +329,6 @@ const Home: React.FC = () => {
         throw new Error(errorMessage);
       }
 
-      // Обновляем состояние локально, удаляя комментарий
       setPosts(prevPosts => 
         prevPosts.map(post => {
           if (post._id === postId) {
@@ -409,8 +423,8 @@ const Home: React.FC = () => {
     const isExpanded = expandedComments[post._id] || false;
     const isCommentFormActive = activeCommentForm === post._id;
     const comments = post.comments || [];
-    const commentsToShow = isExpanded ? comments : comments.slice(0, INITIAL_COMMENTS_SHOW);
-    const hasMoreComments = comments.length > INITIAL_COMMENTS_SHOW;
+    const commentsToShow = isExpanded ? comments : comments.slice(0, 2);
+    const hasMoreComments = comments.length > 2;
 
     return (
       <div key={post._id} className={styles.post}>
@@ -467,7 +481,6 @@ const Home: React.FC = () => {
           </div>
         )}
         
-        {/* Комментарии */}
         <div className={`${styles.commentsSection} ${isExpanded ? styles.expanded : ''}`}>
           {comments.length > 0 && (
             <>
@@ -488,7 +501,6 @@ const Home: React.FC = () => {
             </>
           )}
 
-          {/* Форма добавления комментария */}
           <div className={`${styles.addComment} ${isCommentFormActive ? styles.visible : ''}`}>
             <input
               type="text"

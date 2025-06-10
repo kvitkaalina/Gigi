@@ -1,46 +1,77 @@
-# Getting Started with Create React App
+# GiGi - Social Media Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Фронтенд часть социальной сети GiGi, построенная на React.
 
-## Available Scripts
+## 🚀 Быстрый старт
 
-In the project directory, you can run:
+### Предварительные требования
+- Node.js (версия 14 или выше)
+- npm (устанавливается вместе с Node.js)
+- Запущенный бэкенд сервер (см. [GiGi-backend](https://github.com/kvitkaalina/Gigi-backend))
 
-### `npm start`
+### Установка и запуск
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/kvitkaalina/Gigi.git front
+cd front
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. Установите зависимости:
+```bash
+npm install
+```
 
-### `npm test`
+3. Запустите приложение:
+```bash
+npm start
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000)
 
-### `npm run build`
+## 📁 Структура проекта
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+front/
+├── src/
+│   ├── components/     # React компоненты
+│   ├── services/      # Сервисы для работы с API
+│   ├── hooks/         # Пользовательские хуки
+│   ├── context/       # React контексты
+│   ├── assets/        # Статические файлы
+│   └── styles/        # CSS модули и стили
+├── public/            # Публичные файлы
+└── package.json       # Зависимости и скрипты
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🔄 Работа с Git
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Получение последних изменений
+```bash
+git pull origin main
+```
 
-### `npm run eject`
+### Сохранение ваших изменений
+```bash
+git add .
+git commit -m "Описание ваших изменений"
+git push origin main
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 🛠 Основные команды
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `npm start` - Запуск приложения в режиме разработки
+- `npm run build` - Сборка приложения для продакшена
+- `npm test` - Запуск тестов
+- `npm run lint` - Проверка кода линтером
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 📝 Заметки по разработке
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Приложение использует React Router для навигации
+- Для стилизации используются CSS модули
+- Для работы с API используется fetch
+- Для управления состоянием используется React Context
 
-## Learn More
+## 🔗 Связанные репозитории
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [GiGi Backend](https://github.com/kvitkaalina/Gigi-backend) - Бэкенд часть приложения

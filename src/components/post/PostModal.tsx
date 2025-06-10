@@ -1,0 +1,196 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './PostModal.module.css';
+import defaultAvatar from '../../assets/default-avatar.svg';
+import { likeService, postService, commentService } from '../../services';
+import type { Post, Comment } from '../../services/postService';
+
+interface PostModalProps {
+  post: Post;
+  onClose: () => void;
+  onLikeUpdate?: (postId: string, hasLiked: boolean, likesCount: number) => void;
+}
+
+const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) => {
+  const navigate = useNavigate();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(Math.max(0, post?.likes?.length || 0));
+  const [comments, setComments] = useState<Comment[]>(post?.comments || []);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const userId = localStorage.getItem('userId');
+
+  useEffect(() => {
+    if (post?._id) {
+      checkLikeStatus();
+      fetchComments();
+    }
+  }, [post?._id]);
+  
+  if (!post || !post._id) {
+    console.error('Invalid post data:', post);
+    return null;
+  }
+
+  const checkLikeStatus = async () => {
+    try {
+      const { hasLiked, likesCount: serverLikesCount } = await likeService.checkLikeStatus(post._id);
+      setIsLiked(hasLiked);
+      setLikesCount(Math.max(0, serverLikesCount || 0));
+      onLikeUpdate?.(post._id, hasLiked, serverLikesCount);
+    } catch (err) {
+      console.error('Error checking like status:', err);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const data = await commentService.getComments(post._id);
+      setComments(data || []);
+    } catch (err) {
+      console.error('Error fetching comments:', err);
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      const { hasLiked, likesCount: serverLikesCount } = await likeService.toggleLike(post._id);
+      setIsLiked(hasLiked);
+      setLikesCount(Math.max(0, serverLikesCount || 0));
+      onLikeUpdate?.(post._id, hasLiked, serverLikesCount);
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
+  };
+
+  const handleComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const comment = await commentService.addComment(post._id, newComment);
+      setComments(prev => [comment, ...prev]);
+      setNewComment('');
+    } catch (err) {
+      console.error('Error posting comment:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await commentService.deleteComment(post._id, commentId);
+      setComments(prev => prev.filter(comment => comment._id !== commentId));
+    } catch (err) {
+      console.error('Error deleting comment:', err);
+    }
+  };
+
+  const handleUsernameClick = (username: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/profile/${username}`);
+  };
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+        <div className={styles.imageSection}>
+          <img src={`http://localhost:5001${post.image}`} alt={post.description || 'Post image'} />
+        </div>
+        <div className={styles.contentSection}>
+          <div className={styles.header}>
+            <div className={styles.authorInfo}>
+              <img
+                src={post.author?.avatar ? `http://localhost:5001${post.author.avatar}` : defaultAvatar}
+                alt={post.author?.username}
+                className={styles.avatar}
+                onClick={(e) => handleUsernameClick(post.author.username, e)}
+              />
+              <span
+                className={styles.username}
+                onClick={(e) => handleUsernameClick(post.author.username, e)}
+              >
+                {post.author?.username}
+              </span>
+            </div>
+            <button className={styles.closeButton} onClick={onClose}>
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+
+          {post.description && (
+            <div className={styles.description}>
+              {post.description}
+            </div>
+          )}
+
+          <div className={styles.commentsSection}>
+            {comments.map(comment => (
+              <div key={comment._id} className={styles.comment}>
+                <div className={styles.commentContent}>
+                  <img
+                    src={comment.user?.avatar ? `http://localhost:5001${comment.user.avatar}` : defaultAvatar}
+                    alt={comment.user?.username}
+                    className={styles.commentAvatar}
+                    onClick={(e) => handleUsernameClick(comment.user.username, e)}
+                  />
+                  <div className={styles.commentText}>
+                    <span
+                      className={styles.commentUsername}
+                      onClick={(e) => handleUsernameClick(comment.user.username, e)}
+                    >
+                      {comment.user?.username}
+                    </span>
+                    <span className={styles.commentBody}>{comment.text}</span>
+                    <span className={styles.commentTime}>
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  {comment.user?._id === userId && (
+                    <button
+                      className={styles.deleteComment}
+                      onClick={() => handleDeleteComment(comment._id)}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.actions}>
+            <button
+              className={`${styles.actionButton} ${isLiked ? styles.liked : ''}`}
+              onClick={handleLike}
+            >
+              <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
+            </button>
+            <span className={styles.likesCount}>{likesCount} likes</span>
+          </div>
+
+          <form className={styles.commentForm} onSubmit={handleComment}>
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className={styles.commentInput}
+            />
+            <button
+              type="submit"
+              disabled={!newComment.trim() || isSubmitting}
+              className={styles.postComment}
+            >
+              {isSubmitting ? 'Posting...' : 'Post'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PostModal; 

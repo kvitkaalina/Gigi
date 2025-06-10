@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.chatList {
+  width: 360px;
+  min-width: 360px;
+  flex-shrink: 0;
+  border-right: 1px solid #e5e5e5;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  min-width: 0; /* Важно для правильного flex-shrink */
+}
+
+.noChatSelected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.noChatContent {
+  text-align: center;
+  color: #8e8e8e;
+}
+
+.noChatContent h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #262626;
+}
+
+.noChatContent p {
+  font-size: 14px;
+}
+
+.error {
+  padding: 16px;
+  color: #ff4d4d;
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 16px;
+  color: #8e8e8e;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .chatList {
+    width: 320px;
+    min-width: 320px;
+  }
+} 

@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+.login-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #fafafa;
+  padding: 20px;
+  gap: 32px;
+}
+
+.phones-container {
+  display: none;
+  margin-right: 32px;
+}
+
+@media (min-width: 876px) {
+  .phones-container {
+    display: block;
+    width: 380px;
+  }
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 10px;
+}
+
+.form-box {
+  background-color: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 1px;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.instagram-logo {
+  font-family: 'Great Vibes', cursive;
+  font-size: 44px;
+  text-align: center;
+  margin: 36px auto 12px;
+  background: linear-gradient(45deg, #3a5e63, #46756d, #5c7e84, #2e4b4f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+   text-decoration: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 24px 40px;
+}
+
+.form-input {
+  background: #fafafa;
+  border: 1px solid #dbdbdb;
+  border-radius: 3px;
+  padding: 9px 8px;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: #8e8e8e;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #a8a8a8;
+}
+
+.submit-button {
+  background-color: #3a5e63;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  width: 100%;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #172b2e;
+}
+
+.submit-button:disabled {
+  background-color: #b2dffc;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 40px 18px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #dbdbdb;
+}
+
+.divider-text {
+  color: #737373;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 18px;
+  text-transform: uppercase;
+}
+
+.forgot-password {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.forgot-password a {
+  color:  #01adc8;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #ed4956;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  margin: 10px 40px;
+}
+
+.signup-box {
+  background-color: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 1px;
+  padding: 10px 0;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.signup-box p {
+  color: #262626;
+  font-size: 14px;
+  margin: 15px;
+}
+
+.signup-box a {
+  color:  #01adc8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-box a:hover {
+  text-decoration: underline;
+} 

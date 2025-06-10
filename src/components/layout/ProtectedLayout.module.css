@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content {
+  
+  width: 100%;
+  padding-bottom: 0;
+}
+
+@media (max-width: 1264px) {
+  .content {
+    margin-left: 72px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding-bottom: 60px; /* Высота нижней навигации */
+  }
+} 

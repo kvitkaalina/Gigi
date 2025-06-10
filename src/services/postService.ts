@@ -84,7 +84,7 @@ export const postService = {
     const response = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ text: content })
     });
     return handleApiResponse(response);
   },

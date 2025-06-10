@@ -181,7 +181,7 @@
 .postsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  /* grid-template-rows: repeat(4, 1fr); */
   gap: 28px;
   padding: 0;
   max-width: 935px;

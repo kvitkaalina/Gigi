@@ -95,7 +95,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                 >
                   <img
                     src={user.avatar.startsWith('http') ? user.avatar : `${STATIC_URL}${user.avatar}`}
-                    alt={user.name}
+                    alt={user.username}
                     className={styles.avatar}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -103,7 +103,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                     }}
                   />
                   <div className={styles.userInfo}>
-                    <span className={styles.userName}>{user.name}</span>
+                    <span className={styles.userName}>{user.username}</span>
                   </div>
                 </div>
               ))
@@ -126,7 +126,8 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                 <div className={styles.chatItemAvatar}>
                   <img
                     src={chat.user.avatar.startsWith('http') ? chat.user.avatar : `${STATIC_URL}${chat.user.avatar}`}
-                    alt={chat.user.name}
+                    alt={chat.user.username}
+                    className={styles.avatar}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/default-avatar.jpg';
@@ -135,7 +136,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                   {chat.user.isOnline && <div className={styles.onlineIndicator} />}
                 </div>
                 <div className={styles.chatItemInfo}>
-                  <div className={styles.chatItemName}>{chat.user.name}</div>
+                  <div className={styles.chatItemName}>{chat.user.username}</div>
                   <div className={styles.lastMessage}>
                     <span className={styles.messageText}>
                       {chat.lastMessage?.content || 'No messages yet'}
@@ -170,3 +171,5 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
     </div>
   );
 };
+
+export default ChatList;

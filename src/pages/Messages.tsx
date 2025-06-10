@@ -5,6 +5,7 @@ import { Chat } from '../components/chat/Chat';
 import chatApi from '../api/chatApi';
 import { IChat, IMessage } from '../types/chat';
 import styles from './Messages.module.css';
+import PostsInfo from '../components/feed/PostsInfo';
 
 const Messages: React.FC = () => {
   const [selectedChat, setSelectedChat] = useState<IChat | null>(null);
@@ -90,30 +91,38 @@ const Messages: React.FC = () => {
   return (
     <div className={styles.container}>
       <Sidebar />
-      <div className={styles.chatList}>
-        <ChatList
-          chats={chats}
-          selectedChat={selectedChat}
-          onSelectChat={handleSelectChat}
-          onNewChat={handleNewChat}
-        />
-      </div>
-      <main className={styles.chatArea}>
-        {selectedChat ? (
-          <Chat
-            chat={selectedChat}
-            messages={messages}
-            onSendMessage={handleSendMessage}
+      <div className={styles.content}>
+        <div className={styles.chatList}>
+          <ChatList
+            chats={chats}
+            selectedChat={selectedChat}
+            onSelectChat={handleSelectChat}
+            onNewChat={handleNewChat}
           />
-        ) : (
-          <div className={styles.noChatSelected}>
-            <div className={styles.noChatContent}>
-              <h3>Welcome to Messages</h3>
-              <p>Select a chat to start messaging</p>
+          <div className={styles.copyright}>© 2024 GiGi</div>
+        </div>
+        <main className={styles.chatArea}>
+          {selectedChat ? (
+            <Chat
+              chat={selectedChat}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+            />
+          ) : (
+            <div className={styles.noChatSelected}>
+              <div className={styles.noChatContent}>
+                <img 
+                  src="/images/gigi.png" 
+                  alt="Welcome to Messages" 
+                  className={styles.welcomeImage}
+                />
+                <h3>Welcome to Messages</h3>
+                <p>Select a chat to start messaging</p>
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

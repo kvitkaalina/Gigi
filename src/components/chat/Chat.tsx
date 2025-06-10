@@ -5,6 +5,7 @@ import chatApi from '../../api/chatApi';
 import { IChat, IMessage } from '../../types/chat';
 import { STATIC_URL } from '../../config';
 import styles from './Chat.module.css';
+import { useNavigate } from 'react-router-dom';
 
 interface ChatProps {
   chat: IChat;
@@ -18,6 +19,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
@@ -86,6 +88,10 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
     }
   };
 
+  const handleViewProfile = () => {
+    navigate(`/profile/${chat.user.username}`);
+  };
+
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }
@@ -97,7 +103,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
           <div className={styles.avatarContainer}>
             <img
               src={chat.user.avatar.startsWith('http') ? chat.user.avatar : `${STATIC_URL}${chat.user.avatar}`}
-              alt={chat.user.name}
+              alt={chat.user.username}
               className={styles.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -107,13 +113,18 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
             {chat.user.isOnline && <div className={styles.onlineIndicator} />}
           </div>
           <div className={styles.userDetails}>
-            <h3>{chat.user.name}</h3>
+            <h3>{chat.user.username}</h3>
             <span className={styles.status}>
               {chat.user.isOnline ? 'Online' : 'Offline'}
             </span>
           </div>
         </div>
-        <button className={styles.profileButton}>View Profile</button>
+        <button 
+          className={styles.profileButton}
+          onClick={handleViewProfile}
+        >
+          View Profile
+        </button>
       </header>
 
       <div className={styles.messages}>

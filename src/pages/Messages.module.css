@@ -3,6 +3,11 @@
   height: 100vh;
   width: 100%;
   background: #ffffff;
+}
+
+.content {
+  flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
@@ -14,7 +19,20 @@
   background: #ffffff;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  position: relative;
+}
+
+.copyright {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  text-align: center;
+  color: #8e8e8e;
+  font-size: 12px;
+  background: #ffffff;
+  border-top: 1px solid #f0f2f5;
 }
 
 .chatArea {
@@ -22,7 +40,7 @@
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  min-width: 0; /* Важно для правильного flex-shrink */
+  min-width: 0;
 }
 
 .noChatSelected {
@@ -30,23 +48,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: #fafafa;
+  padding: 40px;
 }
 
 .noChatContent {
   text-align: center;
   color: #8e8e8e;
+  max-width: 360px;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.welcomeImage {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+  border-radius: 60px;
+  object-fit: cover;
 }
 
 .noChatContent h3 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: #262626;
 }
 
 .noChatContent p {
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #8e8e8e;
 }
 
 .error {
@@ -69,5 +103,23 @@
   .chatList {
     width: 320px;
     min-width: 320px;
+  }
+
+  .noChatContent {
+    padding: 24px;
+  }
+
+  .welcomeImage {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+  }
+
+  .noChatContent h3 {
+    font-size: 20px;
+  }
+
+  .noChatContent p {
+    font-size: 14px;
   }
 } 

@@ -210,7 +210,7 @@ const Home: React.FC = () => {
         headers: {
           ...getAuthHeaders()
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ text: content }),
       });
 
       const responseText = await response.text();

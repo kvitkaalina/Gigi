@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../../services';
+import AuthService from '../../utils/auth';
 import styles from './Login.module.css';
 
 interface LoginFormData {
@@ -48,10 +49,12 @@ const Login: React.FC = () => {
       const response = await authService.login(formData);
       console.log('Login successful:', { userId: response._id, username: response.username });
 
-      // Сохраняем все необходимые данные
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('userId', response._id);
-      localStorage.setItem('username', response.username);
+      // Сохраняем данные пользователя через AuthService
+      AuthService.setUserData({
+        token: response.token,
+        userId: response._id,
+        username: response.username
+      });
 
       // Редирект на профиль пользователя
       navigate(`/profile/${response.username}`);
@@ -110,8 +113,8 @@ const Login: React.FC = () => {
               title="Please enter your password"
             />
 
-            <button
-              type="submit"
+            <button 
+              type="submit" 
               disabled={loading}
               className={styles['submit-button']}
             >

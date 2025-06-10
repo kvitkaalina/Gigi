@@ -57,14 +57,13 @@ const Home: React.FC = () => {
 
   const fetchPosts = useCallback(async (pageNum: number = 1) => {
     try {
+      console.log('Fetching posts for page:', pageNum);
       setLoading(true);
       const token = localStorage.getItem('token');
       
       if (!token) {
         throw new Error('No authentication token found');
       }
-
-      console.log('Fetching posts with token:', token);
       
       const response = await fetch(
         `http://localhost:5001/api/posts?page=${pageNum}&limit=${POSTS_PER_PAGE}`,
@@ -81,25 +80,34 @@ const Home: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log('Received posts data:', data);
+      console.log('Received data:', data);
       
+      // Обновляем посты
       if (pageNum === 1) {
         setPosts(data.posts);
       } else {
         setPosts(prev => [...prev, ...data.posts]);
       }
 
+      // Используем hasMore из ответа сервера
       setHasMore(data.hasMore);
+      
+      console.log('Posts fetch status:', {
+        currentPage: data.currentPage,
+        totalPages: data.totalPages,
+        receivedPosts: data.posts.length,
+        hasMore: data.hasMore
+      });
 
-      // Проверяем лайки пользователя для каждого поста
+      // Проверяем лайки
       data.posts.forEach((post: Post) => {
         checkUserLike(post._id);
       });
     } catch (err) {
       console.error('Error fetching posts:', err);
       setError(err instanceof Error ? err.message : 'Failed to load posts');
+      setHasMore(false);
       
-      // Если токен недействителен, перенаправляем на страницу входа
       if (err instanceof Error && err.message.includes('token')) {
         window.location.href = '/login';
       }
@@ -118,6 +126,7 @@ const Home: React.FC = () => {
 
     observer.current = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && hasMore && !loading) {
+        console.log('Loading next page:', page + 1);
         setPage(prev => prev + 1);
       }
     }, options);
@@ -131,7 +140,7 @@ const Home: React.FC = () => {
         observer.current.disconnect();
       }
     };
-  }, [hasMore, loading]);
+  }, [hasMore, loading, page]);
 
   useEffect(() => {
     fetchPosts(1);
@@ -142,6 +151,16 @@ const Home: React.FC = () => {
       fetchPosts(page);
     }
   }, [page, fetchPosts]);
+
+  useEffect(() => {
+    console.log('Component state:', {
+      postsLength: posts.length,
+      loading,
+      hasMore,
+      error,
+      currentPage: page
+    });
+  }, [posts.length, loading, hasMore, error, page]);
 
   const checkUserLike = async (postId: string) => {
     try {
@@ -516,8 +535,11 @@ const Home: React.FC = () => {
                 {renderPost(post)}
               </div>
             ))}
-            {!hasMore && <EndOfFeed />}
-            {posts.length > 0 && <PostsInfo />}
+            {!loading && !hasMore && posts.length > 0 && (
+              <div className={styles.endOfFeedContainer}>
+                <EndOfFeed />
+              </div>
+            )}
           </div>
         )}
       </div>

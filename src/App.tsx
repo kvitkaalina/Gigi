@@ -9,6 +9,7 @@ import CreatePost from './pages/CreatePost';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import Messages from './pages/Messages';
+import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import NotFound from './components/NotFound';
 
@@ -57,6 +58,11 @@ const App: React.FC = () => {
         <Route path="/messages" element={
           <ProtectedRoute>
             <Messages />
+          </ProtectedRoute>
+        } />
+        <Route path="/notifications" element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         } />
         

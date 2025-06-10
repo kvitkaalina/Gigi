@@ -1,0 +1,118 @@
+.layout {
+  display: grid;
+  grid-template-columns: 244px 1fr;
+  min-height: 100vh;
+  background-color: #fafafa;
+}
+
+.sidebarWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 244px;
+  height: 100vh;
+  border-right: 1px solid #dbdbdb;
+  background-color: white;
+  z-index: 100;
+}
+
+.mainContent {
+  grid-column: 2;
+  padding: 20px;
+  max-width: 935px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notificationsWrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.postsInfoWrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.postsInfoWrapper :global(.postsInfo) {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.postsInfoWrapper :global(.navigation) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.postsInfoWrapper :global(.navLink) {
+  color: #8e8e8e;
+  text-decoration: none;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.postsInfoWrapper :global(.copyright) {
+  color: #8e8e8e;
+  font-size: 12px;
+}
+
+@media (max-width: 1264px) {
+  .layout {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .sidebarWrapper {
+    width: 72px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebarWrapper {
+    display: none;
+  }
+
+  .mainContent {
+    padding: 10px;
+  }
+
+  .notificationsWrapper {
+    padding: 10px;
+  }
+
+  .postsInfoWrapper {
+    margin-top: 20px;
+  }
+}
+
+.notificationsPage {
+  background-color: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+}
+
+.container {
+  padding: 20px;
+  max-width: 935px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px); /* Учитываем высоту навбара */
+  background-color: #fafafa;
+} 

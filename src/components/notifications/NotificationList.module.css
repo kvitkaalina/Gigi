@@ -1,0 +1,148 @@
+.notificationContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #262626;
+}
+
+.markAllButton {
+  background: none;
+  border: none;
+  color:  #3a5e63;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.markAllButton:hover {
+  background-color: rgba(0, 149, 246, 0.1);
+}
+
+.notificationList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.notificationItem:hover {
+  background-color: #fafafa;
+}
+
+.unread {
+  background-color: #f0f7ff;
+}
+
+.unread:hover {
+  background-color: #e8f3ff;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.notificationText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.username {
+  font-weight: 600;
+  color: #262626;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: #8e8e8e;
+}
+
+.postThumbnail {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-left: 12px;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #8e8e8e;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.notificationItem:hover .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #262626;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 0;
+  color: #8e8e8e;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 0;
+  color: #8e8e8e;
+}
+
+.error {
+  text-align: center;
+  padding: 40px 0;
+  color: #ed4956;
+} 

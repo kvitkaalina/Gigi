@@ -61,10 +61,11 @@
   text-decoration: none;
   font-size: 12px;
   text-transform: capitalize;
+  transition: color 0.2s ease;
 }
 
 .navLink:hover {
-  color: #262626;
+  color: #3a5e63;
 }
 
 .copyright {

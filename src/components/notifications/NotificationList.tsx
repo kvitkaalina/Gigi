@@ -1,0 +1,174 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { notificationService, Notification } from '../../services/notificationService';
+import styles from './NotificationList.module.css';
+import defaultAvatar from '../../assets/default-avatar.svg';
+
+const NotificationList: React.FC = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      console.log('Fetching notifications...');
+      const data = await notificationService.getNotifications();
+      console.log('Received notifications:', data);
+      setNotifications(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load notifications';
+      console.error('Error fetching notifications:', err);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      console.log('Marking notification as read:', notificationId);
+      await notificationService.markAsRead(notificationId);
+      setNotifications(notifications.map(notif => 
+        notif._id === notificationId ? { ...notif, isRead: true } : notif
+      ));
+      console.log('Successfully marked notification as read');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error marking notification as read';
+      console.error(errorMessage, err);
+      // Показываем ошибку пользователю
+      setError(errorMessage);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      console.log('Marking all notifications as read');
+      await notificationService.markAllAsRead();
+      setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
+      console.log('Successfully marked all notifications as read');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error marking all notifications as read';
+      console.error(errorMessage, err);
+      setError(errorMessage);
+    }
+  };
+
+  const handleDelete = async (notificationId: string) => {
+    try {
+      console.log('Deleting notification:', notificationId);
+      await notificationService.deleteNotification(notificationId);
+      setNotifications(notifications.filter(notif => notif._id !== notificationId));
+      console.log('Successfully deleted notification');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error deleting notification';
+      console.error(errorMessage, err);
+      setError(errorMessage);
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.isRead) {
+      handleMarkAsRead(notification._id);
+    }
+
+    // Навигация в зависимости от типа уведомления
+    if (notification.type === 'like' || notification.type === 'comment') {
+      navigate(`/post/${notification.target?._id}`);
+    } else if (notification.type === 'follow' && notification.actor) {
+      navigate(`/profile/${notification.actor.username}`);
+    }
+  };
+
+  const getNotificationText = (notification: Notification): string => {
+    switch (notification.type) {
+      case 'like':
+        return 'liked your post';
+      case 'comment':
+        return 'commented on your post';
+      case 'follow':
+        return 'started following you';
+      default:
+        return '';
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.loading}>Loading notifications...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  return (
+    <div className={styles.notificationContainer}>
+      <div className={styles.header}>
+        <h2>Notifications</h2>
+        {notifications.some(n => !n.isRead) && (
+          <button 
+            className={styles.markAllButton}
+            onClick={handleMarkAllAsRead}
+          >
+            Mark all as read
+          </button>
+        )}
+      </div>
+
+      {notifications.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>No notifications yet</p>
+        </div>
+      ) : (
+        <div className={styles.notificationList}>
+          {notifications.map(notification => (
+            <div 
+              key={notification._id}
+              className={`${styles.notificationItem} ${!notification.isRead ? styles.unread : ''}`}
+              onClick={() => handleNotificationClick(notification)}
+            >
+              <div className={styles.notificationContent}>
+                <img 
+                  src={notification.actor?.avatar ? `http://localhost:5001${notification.actor.avatar}` : defaultAvatar}
+                  alt={notification.actor?.fullName || notification.actor?.username || 'User'}
+                  className={styles.avatar}
+                />
+                <div className={styles.notificationText}>
+                  <span className={styles.username}>
+                    {notification.actor?.fullName || notification.actor?.username || 'Unknown user'}
+                  </span>
+                  <span>{getNotificationText(notification)}</span>
+                  <span className={styles.time}>
+                    {new Date(notification.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              {notification.type !== 'follow' && notification.target && (
+                <img 
+                  src={`http://localhost:5001${notification.target.image}`}
+                  alt={notification.target.description || "Post thumbnail"}
+                  className={styles.postThumbnail}
+                />
+              )}
+              <button
+                className={styles.deleteButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(notification._id);
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default NotificationList; 

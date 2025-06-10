@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../../services';
+import AuthService from '../../utils/auth';
 import styles from './Register.module.css';
 
 interface RegisterFormData {
@@ -52,10 +53,12 @@ const Register: React.FC = () => {
         username: response.username
       });
       
-      // Save all necessary user data
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('userId', response._id);
-      localStorage.setItem('username', response.username);
+      // Save user data using AuthService
+      AuthService.setUserData({
+        token: response.token,
+        userId: response._id,
+        username: response.username
+      });
       
       // Clear form and redirect
       resetForm();
@@ -77,7 +80,7 @@ const Register: React.FC = () => {
         <div className={styles['form-box']}>
           <h1 className={styles['instagram-logo']}>GiGi</h1>
           <h2 className={styles.subtitle}>
-          Genuine Inspiration, Genuine Images
+            Genuine Inspiration, Genuine Images
           </h2>
 
           {error && <div className={styles['error-message']}>{error}</div>}
@@ -139,8 +142,8 @@ const Register: React.FC = () => {
               title="Password must be at least 6 characters long"
             />
 
-            <button
-              type="submit"
+            <button 
+              type="submit" 
               disabled={loading}
               className={styles['submit-button']}
             >

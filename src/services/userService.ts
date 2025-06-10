@@ -50,7 +50,7 @@ export const userService = {
 
   // Получение подписчиков
   getFollowers: async (userId: string): Promise<FollowUser[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/users/${userId}/followers`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/followers`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -58,7 +58,7 @@ export const userService = {
 
   // Получение подписок
   getFollowing: async (userId: string): Promise<FollowUser[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/users/${userId}/following`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/following`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -66,7 +66,7 @@ export const userService = {
 
   // Проверка статуса подписки
   checkFollowStatus: async (userId: string): Promise<{ following: boolean }> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/users/${userId}/following/check`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/following/check`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -74,7 +74,7 @@ export const userService = {
 
   // Подписка/отписка
   toggleFollow: async (userId: string, isFollowing: boolean): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/users/${userId}/follow`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/follow`, {
       method: isFollowing ? 'DELETE' : 'POST',
       headers: getAuthHeaders()
     });

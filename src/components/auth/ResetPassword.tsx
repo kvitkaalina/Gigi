@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import AuthService from '../../utils/auth';
 import styles from './ResetPassword.module.css';
 
 const ResetPassword: React.FC = () => {
@@ -36,12 +37,11 @@ const ResetPassword: React.FC = () => {
       
       // Если сервер вернул токен и данные пользователя, сохраняем их
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userId', response.data._id);
-        localStorage.setItem('username', response.data.username);
-        
-        // Устанавливаем токен для будущих запросов
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        AuthService.setUserData({
+          token: response.data.token,
+          userId: response.data._id,
+          username: response.data.username
+        });
         
         // Перенаправляем на профиль
         navigate(`/profile/${response.data.username}`);
@@ -95,7 +95,7 @@ const ResetPassword: React.FC = () => {
           />
 
           <button 
-            type="submit"
+            type="submit" 
             className={styles.resetButton}
             disabled={loading}
           >

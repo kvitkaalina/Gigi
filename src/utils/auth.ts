@@ -5,30 +5,30 @@ interface UserData {
 }
 
 class AuthService {
-  private static readonly TOKEN_KEY = 'app_token';
-  private static readonly USER_ID_KEY = 'app_user_id';
-  private static readonly USERNAME_KEY = 'app_username';
+  private static readonly TOKEN_KEY = 'token';
+  private static readonly USER_ID_KEY = 'userId';
+  private static readonly USERNAME_KEY = 'username';
 
-  // Сохраняем данные пользователя в sessionStorage вместо localStorage
+  // Сохраняем данные пользователя в localStorage
   static setUserData(data: UserData): void {
-    sessionStorage.setItem(this.TOKEN_KEY, data.token);
-    sessionStorage.setItem(this.USER_ID_KEY, data.userId);
-    sessionStorage.setItem(this.USERNAME_KEY, data.username);
+    localStorage.setItem(this.TOKEN_KEY, data.token);
+    localStorage.setItem(this.USER_ID_KEY, data.userId);
+    localStorage.setItem(this.USERNAME_KEY, data.username);
   }
 
   // Получаем токен
   static getToken(): string | null {
-    return sessionStorage.getItem(this.TOKEN_KEY);
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   // Получаем ID пользователя
   static getUserId(): string | null {
-    return sessionStorage.getItem(this.USER_ID_KEY);
+    return localStorage.getItem(this.USER_ID_KEY);
   }
 
   // Получаем имя пользователя
   static getUsername(): string | null {
-    return sessionStorage.getItem(this.USERNAME_KEY);
+    return localStorage.getItem(this.USERNAME_KEY);
   }
 
   // Проверяем, авторизован ли пользователь
@@ -38,9 +38,9 @@ class AuthService {
 
   // Очищаем все данные пользователя
   static logout(): void {
-    sessionStorage.removeItem(this.TOKEN_KEY);
-    sessionStorage.removeItem(this.USER_ID_KEY);
-    sessionStorage.removeItem(this.USERNAME_KEY);
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.USERNAME_KEY);
   }
 
   // Получаем заголовки для API запросов
@@ -56,7 +56,7 @@ class AuthService {
 
   // Обновляем токен
   static updateToken(newToken: string): void {
-    sessionStorage.setItem(this.TOKEN_KEY, newToken);
+    localStorage.setItem(this.TOKEN_KEY, newToken);
   }
 }
 

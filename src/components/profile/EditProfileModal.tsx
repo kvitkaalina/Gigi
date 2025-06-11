@@ -11,8 +11,8 @@ interface EditProfileModalProps {
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
-    username: user.username,
-    fullName: user.fullName,
+    username: user.username || '',
+    fullName: user.fullName || '',
     bio: user.bio || ''
   });
   const [error, setError] = useState('');
@@ -24,19 +24,58 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
       ...prev,
       [name]: value
     }));
+    setError('');
+  };
+
+  const validateForm = () => {
+    if (!formData.username.trim()) {
+      setError('Username is required');
+      return false;
+    }
+    if (!formData.fullName.trim()) {
+      setError('Full name is required');
+      return false;
+    }
+    if (formData.username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return false;
+    }
+    if (formData.bio && formData.bio.length > 150) {
+      setError('Bio cannot be longer than 150 characters');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
     try {
-      const updatedUser = await userService.updateProfile(formData);
+      const changedData = {
+        ...(formData.username !== user.username && { username: formData.username }),
+        ...(formData.fullName !== user.fullName && { fullName: formData.fullName }),
+        ...(formData.bio !== user.bio && { bio: formData.bio })
+      };
+
+      if (Object.keys(changedData).length === 0) {
+        onClose();
+        return;
+      }
+
+      const updatedUser = await userService.updateProfile(changedData);
       onUpdate(updatedUser);
+      onClose();
     } catch (err) {
-      setError('Failed to update profile. Please try again.');
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile. Please try again.';
+      setError(errorMessage);
+      console.error('Error updating profile:', err);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +102,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
               onChange={handleChange}
               required
               minLength={3}
+              maxLength={30}
+              pattern="[a-zA-Z0-9_]+"
+              title="Username can only contain letters, numbers, and underscores"
             />
           </div>
 
@@ -75,6 +117,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
               value={formData.fullName}
               onChange={handleChange}
               required
+              maxLength={50}
             />
           </div>
 
@@ -88,6 +131,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
               maxLength={150}
               rows={3}
             />
+            <small className={styles.charCount}>
+              {formData.bio.length}/150 characters
+            </small>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}
@@ -97,6 +143,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
               type="button" 
               className={styles.cancelButton}
               onClick={onClose}
+              disabled={isLoading}
             >
               Cancel
             </button>

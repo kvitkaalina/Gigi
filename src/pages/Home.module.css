@@ -147,11 +147,6 @@
   font-size: 24px;
   color: #262626;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actionButton:hover {
-  opacity: 0.7;
 }
 
 .actionButton.liked {
@@ -169,10 +164,59 @@
   100% { transform: scale(1); }
 }
 
+.doubleTapHeart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  color: white;
+  font-size: 90px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
+}
+
+.doubleTapHeart.active {
+  animation: doubleTapHeartAnimation 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+}
+
+@keyframes doubleTapHeartAnimation {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
 .likes {
   padding: 0 16px 8px;
   font-weight: 600;
   color: #262626;
+}
+
+.likes.updating {
+  animation: likesUpdateAnimation 0.3s ease;
+}
+
+@keyframes likesUpdateAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: #ed4956;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .caption {

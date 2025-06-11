@@ -49,8 +49,9 @@ const NotificationList: React.FC = () => {
     try {
       console.log('Marking all notifications as read');
       await notificationService.markAllAsRead();
-      setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
-      console.log('Successfully marked all notifications as read');
+      // Очищаем список уведомлений
+      setNotifications([]);
+      console.log('Successfully cleared all notifications');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error marking all notifications as read';
       console.error(errorMessage, err);
@@ -109,12 +110,12 @@ const NotificationList: React.FC = () => {
     <div className={styles.notificationContainer}>
       <div className={styles.header}>
         <h2>Notifications</h2>
-        {notifications.some(n => !n.isRead) && (
+        {notifications.length > 0 && (
           <button 
             className={styles.markAllButton}
             onClick={handleMarkAllAsRead}
           >
-            Mark all as read
+            Clear all
           </button>
         )}
       </div>

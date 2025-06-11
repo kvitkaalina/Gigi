@@ -8,7 +8,7 @@ interface LikeResponse {
 export const likeService = {
   // Проверка статуса лайка
   checkLikeStatus: async (postId: string): Promise<LikeResponse> => {
-    const response = await fetch(`${API_BASE_URL}/api/likes/${postId}/check`, {
+    const response = await fetch(`${API_BASE_URL}/api/likes/check/${postId}`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);

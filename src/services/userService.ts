@@ -28,12 +28,26 @@ export const userService = {
 
   // Обновление профиля
   updateProfile: async (data: Partial<User>): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    });
-    return handleApiResponse(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
   },
 
   // Обновление аватара
@@ -50,7 +64,7 @@ export const userService = {
 
   // Получение подписчиков
   getFollowers: async (userId: string): Promise<FollowUser[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/followers`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/followers/${userId}`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -58,7 +72,7 @@ export const userService = {
 
   // Получение подписок
   getFollowing: async (userId: string): Promise<FollowUser[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/following`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/following/${userId}`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -66,7 +80,7 @@ export const userService = {
 
   // Проверка статуса подписки
   checkFollowStatus: async (userId: string): Promise<{ following: boolean }> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/following/check`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/check/${userId}`, {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
@@ -74,7 +88,7 @@ export const userService = {
 
   // Подписка/отписка
   toggleFollow: async (userId: string, isFollowing: boolean): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}/follow`, {
+    const response = await fetch(`${API_BASE_URL}/api/follow/${userId}`, {
       method: isFollowing ? 'DELETE' : 'POST',
       headers: getAuthHeaders()
     });

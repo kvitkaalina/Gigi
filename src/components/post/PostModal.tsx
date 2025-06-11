@@ -4,6 +4,7 @@ import styles from './PostModal.module.css';
 import defaultAvatar from '../../assets/default-avatar.svg';
 import { likeService, postService, commentService } from '../../services';
 import type { Post, Comment } from '../../services/postService';
+import { API_BASE_URL } from '../../services/config';
 
 interface PostModalProps {
   post: Post;
@@ -97,7 +98,14 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.imageSection}>
-          <img src={`http://localhost:5001${post.image}`} alt={post.description || 'Post image'} />
+          <img
+            src={post.image ? `${API_BASE_URL}${post.image}` : defaultAvatar}
+            alt={`Post by ${post.author?.username}`}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = defaultAvatar;
+            }}
+          />
         </div>
         <div className={styles.contentSection}>
           <div className={styles.header}>
@@ -168,7 +176,9 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
             >
               <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
             </button>
-            <span className={styles.likesCount}>{likesCount} likes</span>
+            <span className={styles.likesCount}>
+              {likesCount} likes
+            </span>
           </div>
 
           <form className={styles.commentForm} onSubmit={handleComment}>

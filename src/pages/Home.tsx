@@ -7,37 +7,8 @@ import defaultPost from '../assets/default-post.svg';
 import EndOfFeed from '../components/feed/EndOfFeed';
 import PostsInfo from '../components/feed/PostsInfo';
 import { API_BASE_URL, getAuthHeaders } from '../services/config';
-
-interface User {
-  _id: string;
-  username: string;
-  avatar?: string;
-}
-
-interface Comment {
-  _id: string;
-  text: string;
-  user: {
-    _id: string;
-    username: string;
-    avatar?: string;
-  };
-  createdAt: string;
-}
-
-interface Post {
-  _id: string;
-  description?: string;
-  image: string;
-  author: {
-    _id: string;
-    username: string;
-    avatar?: string;
-  };
-  likes: string[];
-  comments: Comment[];
-  createdAt: string;
-}
+import type { Post, Comment } from '../services/postService';
+import { commentService } from '../services/commentService';
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -55,6 +26,8 @@ const Home: React.FC = () => {
   const POSTS_PER_PAGE = 10;
   const PRELOAD_THRESHOLD = 0.5;
   const navigate = useNavigate();
+  const [doubleTapLike, setDoubleTapLike] = useState<string | null>(null);
+  const [updatingLikes, setUpdatingLikes] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async (pageNum: number = 1, isPreload: boolean = false) => {
     try {
@@ -82,14 +55,48 @@ const Home: React.FC = () => {
 
       const data = await response.json();
       
+      // Получаем актуальное состояние лайков для каждого поста
+      const postsWithLikes = await Promise.all(data.posts.map(async (post: Post) => {
+        try {
+          const likeResponse = await fetch(
+            `http://localhost:5001/api/likes/check/${post._id}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+          
+          if (likeResponse.ok) {
+            const { hasLiked, likesCount } = await likeResponse.json();
+            return {
+              ...post,
+              likesCount,
+              isLiked: hasLiked
+            };
+          }
+          return post;
+        } catch (error) {
+          console.error(`Error fetching likes for post ${post._id}:`, error);
+          return post;
+        }
+      }));
+      
       if (!isPreload) {
         if (pageNum === 1) {
-          setPosts(data.posts);
+          setPosts(postsWithLikes);
         } else {
-          setPosts(prev => [...prev, ...data.posts]);
+          setPosts(prev => [...prev, ...postsWithLikes]);
         }
+        
+        // Обновляем состояние лайков для всех постов
+        const newUserLikes: Record<string, boolean> = {};
+        postsWithLikes.forEach((post: Post) => {
+          newUserLikes[post._id] = post.isLiked || false;
+        });
+        setUserLikes(prev => ({ ...prev, ...newUserLikes }));
       } else {
-        sessionStorage.setItem(`posts_page_${pageNum}`, JSON.stringify(data.posts));
+        sessionStorage.setItem(`posts_page_${pageNum}`, JSON.stringify(postsWithLikes));
       }
 
       setHasMore(data.hasMore);
@@ -97,11 +104,6 @@ const Home: React.FC = () => {
       if (data.hasMore && !isPreload) {
         preloadNextPage(pageNum + 1);
       }
-
-      // Проверяем статус лайков для каждого поста
-      data.posts.forEach((post: Post) => {
-        checkUserLike(post._id);
-      });
 
     } catch (err) {
       console.error('Error fetching posts:', err);
@@ -187,89 +189,59 @@ const Home: React.FC = () => {
     });
   }, [loading, hasMore, posts.length]);
 
-  const checkUserLike = async (postId: string) => {
-    try {
-      const response = await fetch(`http://localhost:5001/api/likes/${postId}/check`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        const { hasLiked, likesCount } = await response.json();
-        setUserLikes(prev => ({ ...prev, [postId]: hasLiked }));
-        setPosts(prevPosts => 
-          prevPosts.map(post => {
-            if (post._id === postId) {
-              return { ...post, likes: Array(likesCount).fill('') };
-            }
-            return post;
-          })
-        );
-      }
-    } catch (error) {
-      console.error('Error checking like status:', error);
-    }
-  };
-
   const handleLike = async (postId: string) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/likes/${postId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/likes/${postId}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: getAuthHeaders()
       });
 
       if (!response.ok) {
         throw new Error('Failed to toggle like');
       }
 
-      const { hasLiked } = await response.json();
-      setUserLikes(prev => ({ ...prev, [postId]: hasLiked }));
+      const { hasLiked, likesCount } = await response.json();
       
-      checkUserLike(postId);
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post._id === postId
+            ? { ...post, isLiked: hasLiked, likesCount }
+            : post
+        )
+      );
+
+      setUserLikes(prev => ({
+        ...prev,
+        [postId]: hasLiked
+      }));
     } catch (error) {
       console.error('Error toggling like:', error);
-      alert('Failed to like post. Please try again.');
+    }
+  };
+
+  const handleImageDoubleClick = async (postId: string) => {
+    const post = posts.find(p => p._id === postId);
+    if (!post?.isLiked) {
+      setDoubleTapLike(postId);
+      await handleLike(postId);
+      setTimeout(() => setDoubleTapLike(null), 800);
     }
   };
 
   const handleCommentSubmit = async (postId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
       const content = newComments[postId];
 
       if (!content?.trim()) return;
+
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
 
       if (!token || !userId) {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders()
-        },
-        body: JSON.stringify({ text: content }),
-      });
-
-      const responseText = await response.text();
-      console.log('Response:', responseText);
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to add comment';
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const newComment = JSON.parse(responseText);
+      const newComment = await commentService.addComment(postId, content.trim());
 
       setPosts(prevPosts => 
         prevPosts.map(post => {
@@ -310,29 +282,7 @@ const Home: React.FC = () => {
         throw new Error('No authorization token found');
       }
 
-      const url = `http://localhost:5001/api/posts/${postId}/comments/${commentId}`;
-      console.log('Delete URL:', url);
-
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to delete comment';
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
+      await commentService.deleteComment(postId, commentId);
 
       setPosts(prevPosts => 
         prevPosts.map(post => {
@@ -453,15 +403,25 @@ const Home: React.FC = () => {
             {post.author?.username || 'Unknown User'}
           </span>
         </div>
-        <img 
-          src={post.image ? `http://localhost:5001${post.image}` : defaultPost}
-          alt="" 
-          className={styles.postImage}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = defaultPost;
-          }}
-        />
+        
+        <div 
+          className={styles.postImageContainer} 
+          onDoubleClick={() => handleImageDoubleClick(post._id)}
+        >
+          <img
+            src={post.image ? `${API_BASE_URL}${post.image}` : defaultPost}
+            alt="Post"
+            className={styles.postImage}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = defaultPost;
+            }}
+          />
+          {doubleTapLike === post._id && (
+            <i className={`fas fa-heart ${styles.doubleTapHeart} ${styles.active}`}></i>
+          )}
+        </div>
+
         <div className={styles.postActions}>
           <button 
             className={`${styles.actionButton} ${isLiked ? styles.liked : ''}`}
@@ -479,7 +439,9 @@ const Home: React.FC = () => {
             )}
           </button>
         </div>
-        <div className={styles.likes}>{post.likes?.length || 0} likes</div>
+        <div className={`${styles.likes} ${updatingLikes === post._id ? styles.updating : ''}`}>
+          {post.likesCount || post.likes?.length || 0} likes
+        </div>
         {post.description && (
           <div className={styles.caption}>
             <span className={styles.username}>{post.author?.username || 'Unknown User'}</span> {post.description}

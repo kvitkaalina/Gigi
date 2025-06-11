@@ -3,12 +3,12 @@ import { api } from '../config';
 
 export const commentService = {
   getComments: async (postId: string): Promise<Comment[]> => {
-    const response = await api.get(`/posts/${postId}/comments`);
+    const response = await api.get(`/posts/post/${postId}`);
     return response.data;
   },
 
   addComment: async (postId: string, text: string): Promise<Comment> => {
-    const response = await api.post(`/posts/${postId}/comments`, { text });
+    const response = await api.post(`/posts/posts/${postId}/comments`, { text });
     return response.data;
   },
 

@@ -43,7 +43,7 @@ export const notificationService = {
   },
 
   // Пометить все уведомления как прочитанные
-  markAllAsRead: async (): Promise<void> => {
+  markAllAsRead: async (): Promise<Notification[]> => {
     const response = await fetch(`${API_BASE_URL}/api/notifications/read-all`, {
       method: 'PUT',
       headers: getAuthHeaders()

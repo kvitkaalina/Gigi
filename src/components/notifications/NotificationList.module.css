@@ -42,7 +42,7 @@
 .markAllButton {
   background: none;
   border: none;
-  color:  #3a5e63;
+  color: #3a5e63;
   font-weight: 600;
   cursor: pointer;
   padding: 5px 10px;
@@ -51,6 +51,13 @@
 
 .markAllButton:hover {
   background-color: rgba(0, 149, 246, 0.1);
+}
+
+.markAllButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #8e8e8e;
+  color: #8e8e8e;
 }
 
 .notificationList {

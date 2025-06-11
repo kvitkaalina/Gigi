@@ -29,6 +29,7 @@ interface AuthResponse {
   email: string;
   fullName: string;
   avatar?: string;
+  role: string;
 }
 
 interface LoginData {

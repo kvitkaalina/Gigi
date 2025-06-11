@@ -113,7 +113,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
         </div>
       ) : (
         <div className={styles.chatList}>
-          {chats.length > 0 ? (
+          {chats.length > 0 &&
             chats.map((chat) => (
               <div
                 key={chat._id}
@@ -153,22 +153,12 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                   <div className={styles.unreadCount}>{chat.unreadCount}</div>
                 )}
               </div>
-            ))
-          ) : (
-            <div className={styles.noChats}>
-              <p>No conversations yet</p>
-              <button
-                className={styles.startChatButton}
-                onClick={() => setIsSearching(true)}
-              >
-                Start a new chat
-              </button>
-            </div>
-          )}
+            ))}
         </div>
       )}
     </div>
   );
 };
+
 
 export default ChatList;

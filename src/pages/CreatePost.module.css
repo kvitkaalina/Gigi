@@ -27,6 +27,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 24px;
+  justify-content: space-between;
 }
 
 .backButton {
@@ -37,12 +38,12 @@
   font-size: 16px;
   color: #46756d;
   transition: all 0.3s ease;
-  margin-right: 16px;
+  order: 2;
 }
 
 .backButton:hover {
   color: #3a5e63;
-  transform: translateX(-2px);
+  transform: translateX(2px);
 }
 
 .title {
@@ -54,6 +55,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  order: 1;
 }
 
 .title::after {

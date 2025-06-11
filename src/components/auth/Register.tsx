@@ -57,14 +57,19 @@ const Register: React.FC = () => {
       AuthService.setUserData({
         token: response.token,
         userId: response._id,
-        username: response.username
+        username: response.username,
+        role: response.role
       });
       
       // Clear form and redirect
       resetForm();
       
-      // Redirect to user's profile
-      navigate(`/profile/${response.username}`);
+      // Redirect based on role
+      if (response.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       console.error('Registration error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'An error occurred during registration';

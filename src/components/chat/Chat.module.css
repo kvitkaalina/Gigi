@@ -6,7 +6,7 @@
 }
 
 .header {
-  padding: 16px;
+  padding: 11px;
   border-bottom: 1px solid #e5e5e5;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@
 }
 
 .footer {
-  padding: 16px;
+  padding: 4px;
   border-top: 1px solid #e5e5e5;
   display: flex;
   gap: 12px;

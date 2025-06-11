@@ -12,6 +12,8 @@ import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import NotFound from './components/NotFound';
+import AdminRoute from './components/auth/AdminRoute';
+import AdminPanel from './components/admin/AdminPanel';
 
 const App: React.FC = () => {
   // Проверяем наличие токена
@@ -65,6 +67,16 @@ const App: React.FC = () => {
             <Notifications />
           </ProtectedRoute>
         } />
+        
+        {/* Админский маршрут */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          }
+        />
         
         {/* 404 страница для всех неизвестных маршрутов */}
         <Route path="*" element={<NotFound />} />

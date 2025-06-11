@@ -11,7 +11,7 @@ const CreatePost: React.FC = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate(-1); // Возвращаемся на предыдущую страницу
+    navigate(-1);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,10 +70,10 @@ const CreatePost: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.createPostCard}>
         <div className={styles.header}>
-          <button onClick={handleBack} className={styles.backButton}>
-            ← Back
-          </button>
           <h1 className={styles.title}>Create New Post</h1>
+          <button onClick={handleBack} className={styles.backButton}>
+            Back →
+          </button>
         </div>
         <form onSubmit={handleSubmit}>
           <div

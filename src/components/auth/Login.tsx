@@ -53,11 +53,16 @@ const Login: React.FC = () => {
       AuthService.setUserData({
         token: response.token,
         userId: response._id,
-        username: response.username
+        username: response.username,
+        role: response.role
       });
 
       // Редирект на профиль пользователя
-      navigate(`/profile/${response.username}`);
+      if (response.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       console.error('Login error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'An error occurred during login';

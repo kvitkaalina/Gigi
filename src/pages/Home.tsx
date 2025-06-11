@@ -98,6 +98,11 @@ const Home: React.FC = () => {
         preloadNextPage(pageNum + 1);
       }
 
+      // Проверяем статус лайков для каждого поста
+      data.posts.forEach((post: Post) => {
+        checkUserLike(post._id);
+      });
+
     } catch (err) {
       console.error('Error fetching posts:', err);
       if (!isPreload) {

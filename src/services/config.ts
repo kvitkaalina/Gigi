@@ -1,9 +1,11 @@
 export const API_BASE_URL = 'http://localhost:5001';
 
-export const getAuthHeaders = () => ({
-  'Authorization': `Bearer ${localStorage.getItem('token')}`,
-  'Content-Type': 'application/json'
-});
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Authorization': `Bearer ${token}`,
+  };
+};
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {

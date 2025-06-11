@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CreatePost.module.css';
+import { postService } from '../services';
 
 const CreatePost: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [caption, setCaption] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -44,23 +46,18 @@ const CreatePost: React.FC = () => {
     if (!image) return;
 
     setIsSubmitting(true);
+    setError('');
+
     try {
       const formData = new FormData();
       formData.append('image', image);
       formData.append('caption', caption);
 
-      const response = await fetch('/api/posts', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        navigate('/');
-      } else {
-        throw new Error('Failed to create post');
-      }
-    } catch (error) {
+      await postService.createPost(formData);
+      navigate('/');
+    } catch (error: any) {
       console.error('Error creating post:', error);
+      setError(error.message || 'Failed to create post');
     } finally {
       setIsSubmitting(false);
     }
@@ -106,6 +103,7 @@ const CreatePost: React.FC = () => {
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
           />
+          {error && <div className={styles.error}>{error}</div>}
           <button
             className={styles.shareButton}
             type="submit"

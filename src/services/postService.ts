@@ -2,16 +2,16 @@ import { API_BASE_URL, getAuthHeaders, handleApiResponse } from './config';
 
 export interface Post {
   _id: string;
-  description: string;
+  description?: string;
   image: string;
-  createdAt: string;
   author: {
     _id: string;
     username: string;
-    avatar: string;
+    avatar?: string;
   };
   likes: string[];
   comments: Comment[];
+  createdAt: string;
 }
 
 export interface Comment {
@@ -20,7 +20,7 @@ export interface Comment {
   user: {
     _id: string;
     username: string;
-    avatar: string;
+    avatar?: string;
   };
   createdAt: string;
 }
@@ -31,7 +31,13 @@ export const postService = {
     const response = await fetch(`${API_BASE_URL}/api/posts/user/${username}`, {
       headers: getAuthHeaders()
     });
-    return handleApiResponse(response);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch user posts');
+    }
+
+    return response.json();
   },
 
   // Получение постов для ленты
@@ -57,11 +63,18 @@ export const postService = {
     const response = await fetch(`${API_BASE_URL}/api/posts`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        ...getAuthHeaders(),
+        // Не добавляем Content-Type, так как это FormData
       },
-      body: formData
+      body: formData,
     });
-    return handleApiResponse(response);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create post');
+    }
+
+    return response.json();
   },
 
   // Удаление поста
@@ -70,7 +83,11 @@ export const postService = {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-    return handleApiResponse(response);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete post');
+    }
   },
 
   // Получение комментариев поста

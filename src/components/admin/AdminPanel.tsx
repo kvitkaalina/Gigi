@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '../../services/adminService';
+import { useNavigate } from 'react-router-dom';
 import styles from './AdminPanel.module.css';
 
 interface User {
@@ -11,6 +12,7 @@ interface User {
 }
 
 const AdminPanel: React.FC = () => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
@@ -56,12 +58,20 @@ const AdminPanel: React.FC = () => {
         loadUsers();
     }, []);
 
+    const handleBack = () => {
+        navigate('/');
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div className={styles.error}>{error}</div>;
 
     return (
         <div className={styles.adminPanel}>
-            <h1>User Management</h1>
+            <button className={styles.backButton} onClick={handleBack}>
+                <i className="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Admin Panel</h1>
             <div className={styles.userList}>
                 <table>
                     <thead>

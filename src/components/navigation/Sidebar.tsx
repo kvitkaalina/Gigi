@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SearchBar from '../search/SearchBar';
 import styles from './Sidebar.module.css';
 import type { SearchUser } from '../../services/searchService';
+import AuthService from '../../utils/auth';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const username = localStorage.getItem('username');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const isAdmin = AuthService.isAdmin();
 
   const handleLogout = () => {
     // Очищаем все данные пользователя
@@ -102,6 +104,20 @@ const Sidebar: React.FC = () => {
       label: 'Profile'
     }
   ];
+
+  // Добавляем кнопку Admin Panel только для администраторов
+  if (isAdmin) {
+    navigationItems.push({
+      path: '/admin',
+      icon: (
+        <svg aria-label="Admin Panel" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <path d="M17.5 2.5h-11c-2.2 0-4 1.8-4 4v11c0 2.2 1.8 4 4 4h11c2.2 0 4-1.8 4-4v-11c0-2.2-1.8-4-4-4zm-11 2h11c1.1 0 2 .9 2 2v2h-15v-2c0-1.1.9-2 2-2zm11 15h-11c-1.1 0-2-.9-2-2v-7h15v7c0 1.1-.9 2-2 2z"/>
+          <path d="M10 14h4v2h-4z"/>
+        </svg>
+      ),
+      label: 'Admin Panel'
+    });
+  }
 
   return (
     <>

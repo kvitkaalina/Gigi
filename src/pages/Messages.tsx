@@ -71,11 +71,11 @@ const Messages: React.FC = () => {
     setSelectedChat(chat);
   };
 
-  const handleSendMessage = async (message: string) => {
+  const handleSendMessage = async (message: string, type: 'text' | 'image' = 'text', file?: File) => {
     if (!selectedChat) return;
 
     try {
-      await chatApi.sendMessage(selectedChat.user._id, message);
+      await chatApi.sendMessage(selectedChat.user._id, message, type, file);
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');

@@ -49,9 +49,19 @@ const chatApi = {
   },
 
   // Отправка сообщения
-  sendMessage: async (userId: string, content: string): Promise<IMessage> => {
+  sendMessage: async (userId: string, content: string, type: 'text' | 'image' = 'text', file?: File): Promise<IMessage> => {
     try {
-      const response = await api.post<IMessage>(`/messages/${userId}`, { content });
+      let data: any;
+      let headers: any = {};
+      if (type === 'image' && file) {
+        data = new FormData();
+        data.append('type', 'image');
+        data.append('file', file);
+        headers['Content-Type'] = 'multipart/form-data';
+      } else {
+        data = { content, type: 'text' };
+      }
+      const response = await api.post<IMessage>(`/messages/${userId}`, data, { headers });
       return response.data;
     } catch (error) {
       return handleError(error as AxiosError);

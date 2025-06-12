@@ -6,11 +6,12 @@ import { IChat, IMessage } from '../../types/chat';
 import { STATIC_URL } from '../../config';
 import styles from './Chat.module.css';
 import { useNavigate } from 'react-router-dom';
+import { FiImage, FiSend } from 'react-icons/fi';
 
 interface ChatProps {
   chat: IChat;
   messages: IMessage[];
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, type?: 'text' | 'image', file?: File) => void;
 }
 
 export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onSendMessage }) => {
@@ -20,6 +21,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageIds = useRef(new Set<string>());
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
   const { startTyping, stopTyping } = useSocket({
@@ -83,7 +85,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
     if (!newMessage.trim()) return;
 
     try {
-      onSendMessage(newMessage.trim());
+      onSendMessage(newMessage.trim(), 'text');
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -91,8 +93,46 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      onSendMessage('', 'image', file);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Failed to upload image');
+    }
+  };
+
   const handleViewProfile = () => {
     navigate(`/profile/${chat.user.username}`);
+  };
+
+  const renderMessage = (message: IMessage) => {
+    const isSent = message.sender._id !== chat.user._id;
+    return (
+      <div
+        key={message._id}
+        className={`${styles.message} ${
+          isSent ? styles.sent : styles.received
+        }`}
+      >
+        <div className={styles.bubble}>
+          {message.type === 'image' ? (
+            <img 
+              src={`${STATIC_URL}${message.content}`} 
+              alt="Message attachment" 
+              className={styles.messageImage}
+              onClick={() => window.open(`${STATIC_URL}${message.content}`, '_blank')}
+            />
+          ) : (
+            <p>{message.content}</p>
+          )}
+          <time>{formatMessageTime(message.createdAt)}</time>
+        </div>
+      </div>
+    );
   };
 
   if (error) {
@@ -131,19 +171,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
       </header>
 
       <div className={styles.messages}>
-        {messages.map((message) => (
-          <div
-            key={message._id}
-            className={`${styles.message} ${
-              message.sender._id === chat.user._id ? styles.received : styles.sent
-            }`}
-          >
-            <div className={styles.bubble}>
-              <p>{message.content}</p>
-              <time>{formatMessageTime(message.createdAt)}</time>
-            </div>
-          </div>
-        ))}
+        {messages.map(renderMessage)}
         {isTyping && (
           <div className={styles.typing}>
             <div className={styles.dot}></div>
@@ -172,12 +200,26 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
           placeholder="Type a message..."
           className={styles.input}
         />
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          accept="image/*"
+          style={{ display: 'none' }}
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className={styles.imageButton}
+          title="Send image"
+        >
+          <FiImage />
+        </button>
         <button
           onClick={handleSendMessage}
           disabled={!newMessage.trim()}
           className={styles.sendButton}
         >
-          Send
+          <FiSend />
         </button>
       </footer>
     </div>

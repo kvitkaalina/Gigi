@@ -3,39 +3,50 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 90vh;
+  max-height: 800px;
   background-color: white;
   padding: 2rem;
+  margin: 2rem auto;
+  overflow-y: auto;
 }
 
 .content {
   max-width: 42rem;
   width: 100%;
   text-align: center;
+  padding: 1rem;
 }
 
 .imageWrapper {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .image {
-  width: 100%;
+  width: auto;
+  height: 100%;
   max-width: 400px;
+  max-height: 300px;
+  object-fit: contain;
   margin: 0 auto;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #333;
 }
 
 .description {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: #666;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
   max-width: 36rem;
   margin-left: auto;
   margin-right: auto;
@@ -45,13 +56,15 @@
   background-color: #3a5e63;
   color: white;
   font-weight: 600;
-  font-size: 1.25rem;
-  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  padding: 0.875rem 2.25rem;
   border-radius: 0.75rem;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(58, 94, 99, 0.2);
+  position: relative;
+  z-index: 2;
 }
 
 .button:hover {
@@ -66,25 +79,39 @@
 }
 
 @media (max-width: 768px) {
+  .container {
+    min-height: 85vh;
+    max-height: 700px;
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+
   .content {
     max-width: 100%;
-    padding: 0 1rem;
+    padding: 0.5rem;
   }
 
-  .title {
-    font-size: 2rem;
-  }
-
-  .description {
-    font-size: 1.1rem;
-  }
-
-  .button {
-    font-size: 1.1rem;
-    padding: 0.875rem 2rem;
+  .imageWrapper {
+    height: 200px;
+    margin-bottom: 1.5rem;
   }
 
   .image {
-    max-width: 300px;
+    max-height: 200px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .description {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 0.75rem 2rem;
   }
 } 

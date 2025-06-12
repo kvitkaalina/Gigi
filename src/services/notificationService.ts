@@ -58,5 +58,17 @@ export const notificationService = {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
+  },
+
+  // Удалить все уведомления
+  deleteAllNotifications: async (notificationIds: string[]): Promise<void> => {
+    await Promise.all(
+      notificationIds.map(id => 
+        fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        })
+      )
+    );
   }
 }; 

@@ -49,9 +49,8 @@ const NotificationList: React.FC = () => {
     try {
       console.log('Marking all notifications as read');
       await notificationService.markAllAsRead();
-      // Очищаем список уведомлений
-      setNotifications([]);
-      console.log('Successfully cleared all notifications');
+      setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
+      console.log('Successfully marked all notifications as read');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error marking all notifications as read';
       console.error(errorMessage, err);
@@ -67,6 +66,23 @@ const NotificationList: React.FC = () => {
       console.log('Successfully deleted notification');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error deleting notification';
+      console.error(errorMessage, err);
+      setError(errorMessage);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      console.log('Deleting all notifications');
+      // Получаем все ID уведомлений
+      const notificationIds = notifications.map(notif => notif._id);
+      // Удаляем все уведомления
+      await notificationService.deleteAllNotifications(notificationIds);
+      // Очищаем список уведомлений
+      setNotifications([]);
+      console.log('Successfully deleted all notifications');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error deleting all notifications';
       console.error(errorMessage, err);
       setError(errorMessage);
     }
@@ -111,12 +127,20 @@ const NotificationList: React.FC = () => {
       <div className={styles.header}>
         <h2>Notifications</h2>
         {notifications.length > 0 && (
-          <button 
-            className={styles.markAllButton}
-            onClick={handleMarkAllAsRead}
-          >
-            Clear all
-          </button>
+          <div className={styles.actionButtons}>
+            <button 
+              className={styles.markAllButton}
+              onClick={handleMarkAllAsRead}
+            >
+              Mark all as read
+            </button>
+            <button 
+              className={styles.deleteAllButton}
+              onClick={handleDeleteAll}
+            >
+              Delete all
+            </button>
+          </div>
         )}
       </div>
 
@@ -149,21 +173,34 @@ const NotificationList: React.FC = () => {
                 </div>
               </div>
               {notification.type !== 'follow' && notification.target && (
-                <img 
-                  src={`http://localhost:5001${notification.target.image}`}
-                  alt={notification.target.description || "Post thumbnail"}
-                  className={styles.postThumbnail}
-                />
+                <div className={styles.imageContainer}>
+                  <img 
+                    src={`http://localhost:5001${notification.target.image}`}
+                    alt={notification.target.description || "Post thumbnail"}
+                    className={styles.postThumbnail}
+                  />
+                  <button
+                    className={styles.deleteButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(notification._id);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
               )}
-              <button
-                className={styles.deleteButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(notification._id);
-                }}
-              >
-                <i className="fas fa-times"></i>
-              </button>
+              {notification.type === 'follow' && (
+                <button
+                  className={styles.deleteButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(notification._id);
+                  }}
+                >
+                  ×
+                </button>
+              )}
             </div>
           ))}
         </div>

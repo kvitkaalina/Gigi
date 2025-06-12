@@ -39,6 +39,11 @@
   border-radius: 2px;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 12px;
+}
+
 .markAllButton {
   background: none;
   border: none;
@@ -47,16 +52,32 @@
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .markAllButton:hover {
-  background-color: rgba(0, 149, 246, 0.1);
+  background-color: rgba(58, 94, 99, 0.1);
 }
 
-.markAllButton:disabled {
+.deleteAllButton {
+  background: none;
+  border: none;
+  color: #ed4956;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.deleteAllButton:hover {
+  background-color: rgba(237, 73, 86, 0.1);
+}
+
+.markAllButton:disabled,
+.deleteAllButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  border-color: #8e8e8e;
   color: #8e8e8e;
 }
 
@@ -128,19 +149,28 @@
   margin-left: 12px;
 }
 
+.imageContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .deleteButton {
   background: none;
   border: none;
   color: #8e8e8e;
   cursor: pointer;
-  padding: 8px;
+  padding: 4px;
   border-radius: 50%;
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   transition: opacity 0.2s, background-color 0.2s;
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .notificationItem:hover .deleteButton {

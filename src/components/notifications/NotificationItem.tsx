@@ -28,8 +28,14 @@ interface NotificationItemProps {
 const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRead }) => {
   const { openPostModal } = usePostModalContext();
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     try {
+      // Сначала помечаем уведомление как прочитанное
+      await onRead(notification._id);
+      
       // Получаем полные данные поста
       const post = await postService.getPostById(notification.post);
       
@@ -38,11 +44,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRea
         focusCommentId: notification.type === 'comment' ? notification.comment?._id : undefined,
         scrollToComments: notification.type === 'comment'
       });
-
-      // Помечаем уведомление как прочитанное
-      onRead(notification._id);
     } catch (error) {
-      console.error('Error fetching post:', error);
+      console.error('Error handling notification click:', error);
     }
   };
 

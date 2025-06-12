@@ -165,12 +165,6 @@ const Home: React.FC = () => {
   }, [fetchPosts]);
 
   useEffect(() => {
-    if (page > 1) {
-      fetchPosts(page);
-    }
-  }, [page, fetchPosts]);
-
-  useEffect(() => {
     console.log('Component state:', {
       postsLength: posts.length,
       loading,

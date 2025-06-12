@@ -87,7 +87,7 @@ const NotificationList: React.FC = () => {
     }
   };
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
     console.log('Notification clicked:', {
       type: notification.type,
       target: notification.target,
@@ -95,18 +95,20 @@ const NotificationList: React.FC = () => {
     });
 
     if (!notification.isRead) {
-      handleMarkAsRead(notification._id);
+      await handleMarkAsRead(notification._id);
     }
 
-    if ((notification.type === 'like' || notification.type === 'comment') && notification.target?._id) {
-      console.log('Navigating to post:', notification.target._id);
-      navigate(`/post/${notification.target._id}`);
-    } else if (notification.type === 'follow' && notification.actor?.username) {
-      console.log('Navigating to profile:', notification.actor.username);
-      navigate(`/profile/${notification.actor.username}`);
-    } else {
-      console.warn('Missing required data for navigation:', { notification });
-    }
+    setTimeout(() => {
+      if ((notification.type === 'like' || notification.type === 'comment') && notification.target?._id) {
+        console.log('Navigating to post:', notification.target._id);
+        navigate(`/post/${notification.target._id}`);
+      } else if (notification.type === 'follow' && notification.actor?.username) {
+        console.log('Navigating to profile:', notification.actor.username);
+        navigate(`/profile/${notification.actor.username}`);
+      } else {
+        console.warn('Missing required data for navigation:', { notification });
+      }
+    }, 100);
   };
 
   const getNotificationText = (notification: Notification): string => {

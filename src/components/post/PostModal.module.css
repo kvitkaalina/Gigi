@@ -112,10 +112,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.2s ease;
 }
 
 .closeButton:hover {
   opacity: 0.7;
+}
+
+.closeButton:active {
+  opacity: 1;
+}
+
+/* Убираем outline при фокусе, но сохраняем доступность */
+.closeButton:focus {
+  outline: none;
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid #0095f6;
+  outline-offset: 2px;
 }
 
 .description {

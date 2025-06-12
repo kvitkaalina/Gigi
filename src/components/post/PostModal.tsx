@@ -146,19 +146,25 @@ const PostModal: React.FC<PostModalProps> = ({
     onClose();
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleCloseClick = (e: React.MouseEvent) => {
+  const handleModalClose = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onClose();
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+      onClose();
+    }
+  };
+
   return (
-    <div className={`${styles.overlay} ${isStandalone ? styles.standalone : ''}`} onClick={handleOverlayClick}>
+    <div 
+      className={`${styles.overlay} ${isStandalone ? styles.standalone : ''}`}
+      onClick={handleOverlayClick}
+    >
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.imageSection}>
           <img
@@ -187,7 +193,11 @@ const PostModal: React.FC<PostModalProps> = ({
               </span>
             </div>
             {!isStandalone && (
-              <button className={styles.closeButton} onClick={handleCloseClick}>
+              <button 
+                className={styles.closeButton} 
+                onClick={handleModalClose}
+                aria-label="Close modal"
+              >
                 <i className="fas fa-times"></i>
               </button>
             )}

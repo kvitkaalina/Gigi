@@ -30,11 +30,23 @@ export const PostModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { isModalOpen, selectedPost, focusedCommentId, shouldScrollToComments, openModal, closeModal } = usePostModal();
 
   const handleClose = () => {
+    // Предотвращаем множественные вызовы
+    if (!isModalOpen) return;
+    
+    // Закрываем модальное окно
     closeModal();
-    // Проверяем, находимся ли мы на странице поста
-    if (location.pathname.startsWith('/post/')) {
-      // Используем replace вместо navigate(-1), чтобы избежать проблем с историей
-      navigate('/', { replace: true });
+    
+    // Проверяем текущий путь
+    const isPostPage = location.pathname.startsWith('/post/');
+    const isHomePage = location.pathname === '/';
+    const isNotificationsPage = location.pathname === '/notifications';
+    
+    // Выполняем навигацию только если мы на странице поста и не на главной/уведомлениях
+    if (isPostPage && !isHomePage && !isNotificationsPage) {
+      // Добавляем небольшую задержку перед навигацией
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     }
   };
 

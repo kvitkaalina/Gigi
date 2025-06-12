@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { useSocket } from '../../hooks/useSocket';
 import chatApi from '../../api/chatApi';
@@ -19,11 +19,14 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageIds = useRef(new Set<string>());
   const navigate = useNavigate();
-
+  
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
-      if (message.sender._id === chat.user._id || message.receiver._id === chat.user._id) {
+      if ((message.sender._id === chat.user._id || message.receiver._id === chat.user._id) && 
+          !messageIds.current.has(message._id)) {
+        messageIds.current.add(message._id);
         setMessages(prev => [...prev, message]);
       }
     },
@@ -63,6 +66,8 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
     const loadMessages = async () => {
       try {
         const chatMessages = await chatApi.getMessages(chat.user._id);
+        messageIds.current.clear();
+        chatMessages.forEach(msg => messageIds.current.add(msg._id));
         setMessages(chatMessages);
         await chatApi.markAsRead(chat.user._id);
       } catch (error) {
@@ -78,10 +83,8 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
     if (!newMessage.trim()) return;
 
     try {
-      const message = await chatApi.sendMessage(chat.user._id, newMessage.trim());
-      setMessages(prev => [...prev, message]);
-      setNewMessage('');
       onSendMessage(newMessage.trim());
+      setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');

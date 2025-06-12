@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../components/navigation/Sidebar';
 import { ChatList } from '../components/chat/ChatList';
 import { Chat } from '../components/chat/Chat';
@@ -13,6 +13,7 @@ const Messages: React.FC = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const messageIds = useRef(new Set<string>());
 
   useEffect(() => {
     const loadChats = async () => {
@@ -40,6 +41,8 @@ const Messages: React.FC = () => {
         try {
           setLoading(true);
           const chatMessages = await chatApi.getMessages(selectedChat.user._id);
+          messageIds.current.clear();
+          chatMessages.forEach(msg => messageIds.current.add(msg._id));
           setMessages(chatMessages);
         } catch (error) {
           console.error('Error loading messages:', error);
@@ -72,8 +75,7 @@ const Messages: React.FC = () => {
     if (!selectedChat) return;
 
     try {
-      const newMessage = await chatApi.sendMessage(selectedChat.user._id, message);
-      setMessages(prev => [...prev, newMessage]);
+      await chatApi.sendMessage(selectedChat.user._id, message);
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');

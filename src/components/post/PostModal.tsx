@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './PostModal.module.css';
 import defaultAvatar from '../../assets/default-avatar.svg';
@@ -10,9 +10,19 @@ interface PostModalProps {
   post: Post;
   onClose: () => void;
   onLikeUpdate?: (postId: string, hasLiked: boolean, likesCount: number) => void;
+  isStandalone?: boolean;
+  focusedCommentId?: string;
+  shouldScrollToComments?: boolean;
 }
 
-const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) => {
+const PostModal: React.FC<PostModalProps> = ({
+  post,
+  onClose,
+  onLikeUpdate,
+  isStandalone,
+  focusedCommentId,
+  shouldScrollToComments
+}) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(Math.max(0, post?.likes?.length || 0));
@@ -20,6 +30,10 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userId = localStorage.getItem('userId');
+  
+  const commentsSectionRef = useRef<HTMLDivElement>(null);
+  const [highlightedCommentId, setHighlightedCommentId] = useState<string | undefined>(focusedCommentId);
+  const [isHighlightFading, setIsHighlightFading] = useState(false);
 
   useEffect(() => {
     if (post?._id) {
@@ -27,7 +41,44 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
       fetchComments();
     }
   }, [post?._id]);
-  
+
+  useEffect(() => {
+    if (shouldScrollToComments && commentsSectionRef.current) {
+      commentsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [shouldScrollToComments]);
+
+  useEffect(() => {
+    if (focusedCommentId) {
+      setHighlightedCommentId(focusedCommentId);
+      setIsHighlightFading(false);
+
+      // Прокручиваем к комментарию с задержкой для анимации
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`comment-${focusedCommentId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+
+      // Начинаем затухание подсветки через 3 секунды
+      const fadeTimer = setTimeout(() => {
+        setIsHighlightFading(true);
+      }, 3000);
+
+      // Убираем подсветку через 3.3 секунды (после анимации затухания)
+      const removeTimer = setTimeout(() => {
+        setHighlightedCommentId(undefined);
+      }, 3300);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(fadeTimer);
+        clearTimeout(removeTimer);
+      };
+    }
+  }, [focusedCommentId]);
+
   if (!post || !post._id) {
     console.error('Invalid post data:', post);
     return null;
@@ -89,14 +140,26 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
     }
   };
 
-  const handleUsernameClick = (username: string, e: React.MouseEvent) => {
+  const handleCommentClick = (username: string, e: React.MouseEvent) => {
     e.stopPropagation();
     navigate(`/profile/${username}`);
+    onClose();
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleCloseClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+    <div className={`${styles.overlay} ${isStandalone ? styles.standalone : ''}`} onClick={handleOverlayClick}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.imageSection}>
           <img
             src={post.image ? `${API_BASE_URL}${post.image}` : defaultAvatar}
@@ -111,21 +174,23 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
           <div className={styles.header}>
             <div className={styles.authorInfo}>
               <img
-                src={post.author?.avatar ? `http://localhost:5001${post.author.avatar}` : defaultAvatar}
+                src={post.author?.avatar ? `${API_BASE_URL}${post.author.avatar}` : defaultAvatar}
                 alt={post.author?.username}
                 className={styles.avatar}
-                onClick={(e) => handleUsernameClick(post.author.username, e)}
+                onClick={(e) => handleCommentClick(post.author.username, e)}
               />
               <span
                 className={styles.username}
-                onClick={(e) => handleUsernameClick(post.author.username, e)}
+                onClick={(e) => handleCommentClick(post.author.username, e)}
               >
                 {post.author?.username}
               </span>
             </div>
-            <button className={styles.closeButton} onClick={onClose}>
-              <i className="fas fa-times"></i>
-            </button>
+            {!isStandalone && (
+              <button className={styles.closeButton} onClick={handleCloseClick}>
+                <i className="fas fa-times"></i>
+              </button>
+            )}
           </div>
 
           {post.description && (
@@ -134,21 +199,26 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
             </div>
           )}
 
-          <div className={styles.commentsSection}>
+          <div className={styles.commentsSection} ref={commentsSectionRef}>
             {comments.map(comment => (
-              <div key={comment._id} className={styles.comment}>
+              <div
+                key={comment._id}
+                id={`comment-${comment._id}`}
+                className={`
+                  ${styles.comment}
+                  ${comment._id === highlightedCommentId ? styles.highlighted : ''}
+                  ${comment._id === highlightedCommentId && isHighlightFading ? styles.fadeOut : ''}
+                `}
+                onClick={(e) => handleCommentClick(comment.user.username, e)}
+              >
                 <div className={styles.commentContent}>
                   <img
-                    src={comment.user?.avatar ? `http://localhost:5001${comment.user.avatar}` : defaultAvatar}
+                    src={comment.user?.avatar ? `${API_BASE_URL}${comment.user.avatar}` : defaultAvatar}
                     alt={comment.user?.username}
                     className={styles.commentAvatar}
-                    onClick={(e) => handleUsernameClick(comment.user.username, e)}
                   />
                   <div className={styles.commentText}>
-                    <span
-                      className={styles.commentUsername}
-                      onClick={(e) => handleUsernameClick(comment.user.username, e)}
-                    >
+                    <span className={styles.commentUsername}>
                       {comment.user?.username}
                     </span>
                     <span className={styles.commentBody}>{comment.text}</span>
@@ -159,7 +229,10 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
                   {comment.user?._id === userId && (
                     <button
                       className={styles.deleteComment}
-                      onClick={() => handleDeleteComment(comment._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteComment(comment._id);
+                      }}
                     >
                       <i className="fas fa-trash"></i>
                     </button>
@@ -203,4 +276,4 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onLikeUpdate }) =>
   );
 };
 
-export default PostModal; 
+export default PostModal;

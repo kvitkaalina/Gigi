@@ -115,5 +115,13 @@ export const postService = {
       headers: getAuthHeaders()
     });
     return handleApiResponse(response);
+  },
+
+  // Получение отдельного поста по ID
+  getPostById: async (postId: string): Promise<Post> => {
+    const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+      headers: getAuthHeaders()
+    });
+    return handleApiResponse(response);
   }
 }; 

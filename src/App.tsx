@@ -7,6 +7,7 @@ import ResetPassword from './components/auth/ResetPassword';
 import Home from './pages/Home';
 import CreatePost from './pages/CreatePost';
 import Profile from './pages/Profile';
+import Post from './pages/Post';
 import Explore from './pages/Explore';
 import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
@@ -14,6 +15,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import NotFound from './components/NotFound';
 import AdminRoute from './components/auth/AdminRoute';
 import AdminPanel from './components/admin/AdminPanel';
+import { PostModalProvider } from './components/post/PostModalProvider';
 
 const App: React.FC = () => {
   // Проверяем наличие токена
@@ -21,66 +23,73 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/register" element={
-          token ? <Navigate to="/" replace /> : <Register />
-        } />
-        <Route path="/login" element={
-          token ? <Navigate to="/" replace /> : <Login />
-        } />
-        <Route path="/forgot-password" element={
-          token ? <Navigate to="/" replace /> : <ForgotPassword />
-        } />
-        <Route path="/reset-password/:token" element={
-          token ? <Navigate to="/" replace /> : <ResetPassword />
-        } />
-        
-        {/* Protected routes */}
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path="/create" element={
-          <ProtectedRoute>
-            <CreatePost />
-          </ProtectedRoute>
-        } />
-        <Route path="/profile/:username" element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } />
-        <Route path="/explore" element={
-          <ProtectedRoute>
-            <Explore />
-          </ProtectedRoute>
-        } />
-        <Route path="/messages" element={
-          <ProtectedRoute>
-            <Messages />
-          </ProtectedRoute>
-        } />
-        <Route path="/notifications" element={
-          <ProtectedRoute>
-            <Notifications />
-          </ProtectedRoute>
-        } />
-        
-        {/* Админский маршрут */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminPanel />
-            </AdminRoute>
-          }
-        />
-        
-        {/* 404 страница для всех неизвестных маршрутов */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <PostModalProvider>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/register" element={
+            token ? <Navigate to="/" replace /> : <Register />
+          } />
+          <Route path="/login" element={
+            token ? <Navigate to="/" replace /> : <Login />
+          } />
+          <Route path="/forgot-password" element={
+            token ? <Navigate to="/" replace /> : <ForgotPassword />
+          } />
+          <Route path="/reset-password/:token" element={
+            token ? <Navigate to="/" replace /> : <ResetPassword />
+          } />
+          
+          {/* Protected routes */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+          <Route path="/create" element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile/:username" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/explore" element={
+            <ProtectedRoute>
+              <Explore />
+            </ProtectedRoute>
+          } />
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          } />
+          <Route path="/notifications" element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          } />
+          <Route path="/post/:id" element={
+            <ProtectedRoute>
+              <Post />
+            </ProtectedRoute>
+          } />
+          
+          {/* Админский маршрут */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
+          
+          {/* 404 страница для всех неизвестных маршрутов */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PostModalProvider>
     </Router>
   );
 };

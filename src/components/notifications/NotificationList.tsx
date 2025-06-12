@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notificationService, Notification } from '../../services/notificationService';
+import { API_BASE_URL } from '../../services/config';
+import { getAssetUrl } from '../../utils/urls';
 import styles from './NotificationList.module.css';
 import defaultAvatar from '../../assets/default-avatar.svg';
+import { formatDistanceToNow } from 'date-fns';
 
 const NotificationList: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -40,7 +43,6 @@ const NotificationList: React.FC = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error marking notification as read';
       console.error(errorMessage, err);
-      // Показываем ошибку пользователю
       setError(errorMessage);
     }
   };
@@ -74,11 +76,8 @@ const NotificationList: React.FC = () => {
   const handleDeleteAll = async () => {
     try {
       console.log('Deleting all notifications');
-      // Получаем все ID уведомлений
       const notificationIds = notifications.map(notif => notif._id);
-      // Удаляем все уведомления
       await notificationService.deleteAllNotifications(notificationIds);
-      // Очищаем список уведомлений
       setNotifications([]);
       console.log('Successfully deleted all notifications');
     } catch (err) {
@@ -89,15 +88,24 @@ const NotificationList: React.FC = () => {
   };
 
   const handleNotificationClick = (notification: Notification) => {
+    console.log('Notification clicked:', {
+      type: notification.type,
+      target: notification.target,
+      actor: notification.actor
+    });
+
     if (!notification.isRead) {
       handleMarkAsRead(notification._id);
     }
 
-    // Навигация в зависимости от типа уведомления
-    if (notification.type === 'like' || notification.type === 'comment') {
-      navigate(`/post/${notification.target?._id}`);
-    } else if (notification.type === 'follow' && notification.actor) {
+    if ((notification.type === 'like' || notification.type === 'comment') && notification.target?._id) {
+      console.log('Navigating to post:', notification.target._id);
+      navigate(`/post/${notification.target._id}`);
+    } else if (notification.type === 'follow' && notification.actor?.username) {
+      console.log('Navigating to profile:', notification.actor.username);
       navigate(`/profile/${notification.actor.username}`);
+    } else {
+      console.warn('Missing required data for navigation:', { notification });
     }
   };
 
@@ -112,6 +120,10 @@ const NotificationList: React.FC = () => {
       default:
         return '';
     }
+  };
+
+  const formatNotificationTime = (createdAt: string) => {
+    return formatDistanceToNow(new Date(createdAt), { addSuffix: true });
   };
 
   if (loading) {
@@ -158,9 +170,13 @@ const NotificationList: React.FC = () => {
             >
               <div className={styles.notificationContent}>
                 <img 
-                  src={notification.actor?.avatar ? `http://localhost:5001${notification.actor.avatar}` : defaultAvatar}
+                  src={notification.actor?.avatar ? getAssetUrl(notification.actor.avatar) : defaultAvatar}
                   alt={notification.actor?.fullName || notification.actor?.username || 'User'}
                   className={styles.avatar}
+                  onError={(e) => {
+                    console.error('Failed to load actor avatar');
+                    e.currentTarget.src = defaultAvatar;
+                  }}
                 />
                 <div className={styles.notificationText}>
                   <span className={styles.username}>
@@ -168,16 +184,21 @@ const NotificationList: React.FC = () => {
                   </span>
                   <span>{getNotificationText(notification)}</span>
                   <span className={styles.time}>
-                    {new Date(notification.createdAt).toLocaleDateString()}
+                    {formatNotificationTime(notification.createdAt)}
+                    {!notification.isRead && <span className={styles.newLabel}>New</span>}
                   </span>
                 </div>
               </div>
-              {notification.type !== 'follow' && notification.target && (
+              {notification.type !== 'follow' && notification.target?.image && (
                 <div className={styles.imageContainer}>
                   <img 
-                    src={`http://localhost:5001${notification.target.image}`}
-                    alt={notification.target.description || "Post thumbnail"}
+                    src={getAssetUrl(notification.target.image)}
+                    alt={notification.target?.description || "Post thumbnail"}
                     className={styles.postThumbnail}
+                    onError={(e) => {
+                      console.error('Failed to load notification image');
+                      e.currentTarget.src = defaultAvatar;
+                    }}
                   />
                   <button
                     className={styles.deleteButton}

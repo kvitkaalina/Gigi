@@ -1,0 +1,37 @@
+import { useState } from 'react';
+import type { Post } from '../services/postService';
+
+interface OpenModalOptions {
+  focusCommentId?: string;
+  scrollToComments?: boolean;
+}
+
+export const usePostModal = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [focusedCommentId, setFocusedCommentId] = useState<string | undefined>(undefined);
+  const [shouldScrollToComments, setShouldScrollToComments] = useState(false);
+
+  const openModal = (post: Post, options?: OpenModalOptions) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+    setFocusedCommentId(options?.focusCommentId);
+    setShouldScrollToComments(options?.scrollToComments || false);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+    setFocusedCommentId(undefined);
+    setShouldScrollToComments(false);
+  };
+
+  return {
+    isModalOpen,
+    selectedPost,
+    focusedCommentId,
+    shouldScrollToComments,
+    openModal,
+    closeModal
+  };
+}; 

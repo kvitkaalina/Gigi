@@ -97,6 +97,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   position: relative;
+  margin-bottom: 8px;
 }
 
 .notificationItem:hover {
@@ -105,6 +106,7 @@
 
 .unread {
   background-color: #f0f7ff;
+  border: 1px solid #e1efff;
 }
 
 .unread:hover {
@@ -116,6 +118,17 @@
   align-items: center;
   gap: 12px;
   flex: 1;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.userInfo:hover .username {
+  text-decoration: underline;
 }
 
 .avatar {
@@ -136,9 +149,32 @@
   color: #262626;
 }
 
+.messageText {
+  display: block;
+  margin-bottom: 4px;
+}
+
 .time {
   font-size: 0.8rem;
   color: #8e8e8e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.newLabel {
+  color: #65b3bd;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.imageContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .postThumbnail {
@@ -147,12 +183,6 @@
   object-fit: cover;
   border-radius: 4px;
   margin-left: 12px;
-}
-
-.imageContainer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .deleteButton {

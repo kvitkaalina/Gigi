@@ -81,12 +81,14 @@
   margin-bottom: 8px;
   max-width: 70%;
   clear: both;
+  position: relative;
 }
 
 .bubble {
   padding: 12px 16px;
   border-radius: 16px;
   display: inline-block;
+  position: relative;
 }
 
 .bubble p {
@@ -231,4 +233,26 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #b0b0b0;
+  font-size: 16px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+.message:hover .deleteButton,
+.bubble:hover .deleteButton {
+  opacity: 1;
+}
+.deleteButton:hover {
+  color: #ff4d4d;
 } 

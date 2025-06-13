@@ -98,6 +98,15 @@ const chatApi = {
     } catch (error) {
       return handleError(error as AxiosError);
     }
+  },
+
+  // Удаление сообщения
+  deleteMessage: async (messageId: string): Promise<void> => {
+    try {
+      await api.delete(`/messages/${messageId}`);
+    } catch (error) {
+      return handleError(error as AxiosError);
+    }
   }
 };
 

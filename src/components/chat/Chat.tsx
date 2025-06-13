@@ -12,9 +12,10 @@ interface ChatProps {
   messages: IMessage[];
   onSendMessage: (message: string, type?: 'text' | 'image', file?: File) => void;
   onNewSocketMessage: (message: IMessage) => void;
+  onDeleteMessage: (messageId: string) => void;
 }
 
-export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNewSocketMessage }) => {
+export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNewSocketMessage, onDeleteMessage }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -22,6 +23,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const currentUserId = localStorage.getItem('userId');
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
@@ -110,12 +112,14 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   };
 
   const renderMessage = (message: IMessage) => {
-    const isSent = message.sender._id !== chat.user._id;
+    const isOwn = message.sender._id === currentUserId;
+    const isSent = !isOwn;
     const isImage = message.type === 'image';
     return (
       <div
         key={message._id}
         className={`${styles.message} ${isSent ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
+        style={{ position: 'relative' }}
       >
         {isImage ? (
           <>
@@ -126,11 +130,17 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
               onClick={() => window.open(`${STATIC_URL}${message.content}`, '_blank')}
             />
             <time>{formatMessageTime(message.createdAt)}</time>
+            {isOwn && (
+              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+            )}
           </>
         ) : (
-          <div className={styles.bubble}>
+          <div className={styles.bubble} style={{ position: 'relative' }}>
             <p>{message.content}</p>
             <time>{formatMessageTime(message.createdAt)}</time>
+            {isOwn && (
+              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+            )}
           </div>
         )}
       </div>

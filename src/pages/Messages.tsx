@@ -89,6 +89,15 @@ const Messages: React.FC = () => {
     });
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      await chatApi.deleteMessage(messageId);
+      setMessages(prev => prev.filter(m => m._id !== messageId));
+    } catch (error) {
+      setError('Failed to delete message');
+    }
+  };
+
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }
@@ -117,6 +126,7 @@ const Messages: React.FC = () => {
               messages={messages}
               onSendMessage={handleSendMessage}
               onNewSocketMessage={handleNewSocketMessage}
+              onDeleteMessage={handleDeleteMessage}
             />
           ) : (
             <div className={styles.noChatSelected}>

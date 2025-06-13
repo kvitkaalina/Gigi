@@ -24,6 +24,8 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const currentUserId = localStorage.getItem('userId');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
@@ -111,6 +113,31 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     navigate(`/profile/${chat.user.username}`);
   };
 
+  const handleEditClick = (message: IMessage) => {
+    setEditingId(message._id);
+    setEditingValue(message.content);
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditingValue(e.target.value);
+  };
+
+  const handleEditSave = async (messageId: string) => {
+    try {
+      await chatApi.editMessage(messageId, editingValue);
+      setEditingId(null);
+      setEditingValue('');
+      // Не обновляем сообщения локально, ждем обновления от родителя
+    } catch (error) {
+      alert('Ошибка при редактировании сообщения');
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditingValue('');
+  };
+
   const renderMessage = (message: IMessage) => {
     const isOwn = message.sender._id === currentUserId;
     const isSent = !isOwn;
@@ -136,10 +163,30 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
           </>
         ) : (
           <div className={styles.bubble} style={{ position: 'relative' }}>
-            <p>{message.content}</p>
-            <time>{formatMessageTime(message.createdAt)}</time>
-            {isOwn && (
-              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+            {editingId === message._id ? (
+              <>
+                <input
+                  className={styles.editInput}
+                  value={editingValue}
+                  onChange={handleEditChange}
+                  autoFocus
+                />
+                <button className={styles.saveButton} onClick={() => handleEditSave(message._id)} title="Save">✔</button>
+                <button className={styles.cancelButton} onClick={handleEditCancel} title="Cancel">✖</button>
+              </>
+            ) : (
+              <>
+                <p>{message.content}</p>
+                <div className={styles.timeEditRow}>
+                  <time>{formatMessageTime(message.createdAt)}</time>
+                  {isOwn && (
+                    <button className={styles.editButton} onClick={() => handleEditClick(message)} title="Edit message">✎</button>
+                  )}
+                </div>
+                {isOwn && (
+                  <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+                )}
+              </>
             )}
           </div>
         )}

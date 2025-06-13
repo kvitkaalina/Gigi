@@ -98,6 +98,17 @@ const Messages: React.FC = () => {
     }
   };
 
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    try {
+      await chatApi.editMessage(messageId, newContent);
+      setMessages(prev => prev.map(m => 
+        m._id === messageId ? { ...m, content: newContent } : m
+      ));
+    } catch (error) {
+      setError('Failed to edit message');
+    }
+  };
+
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }

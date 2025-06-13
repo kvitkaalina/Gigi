@@ -107,6 +107,15 @@ const chatApi = {
     } catch (error) {
       return handleError(error as AxiosError);
     }
+  },
+
+  // Редактирование сообщения
+  editMessage: async (messageId: string, content: string): Promise<void> => {
+    try {
+      await api.patch(`/messages/${messageId}`, { content });
+    } catch (error) {
+      return handleError(error as AxiosError);
+    }
   }
 };
 

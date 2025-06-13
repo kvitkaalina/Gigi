@@ -52,16 +52,17 @@ const chatApi = {
   sendMessage: async (userId: string, content: string, type: 'text' | 'image' = 'text', file?: File): Promise<IMessage> => {
     try {
       let data: any;
-      let headers: any = {};
+      let config: any = {};
       if (type === 'image' && file) {
         data = new FormData();
         data.append('type', 'image');
         data.append('file', file);
-        headers['Content-Type'] = 'multipart/form-data';
+        config.headers = { 'Content-Type': 'multipart/form-data' };
       } else {
         data = { content, type: 'text' };
+        // Не передаём headers, чтобы axios сам поставил application/json
       }
-      const response = await api.post<IMessage>(`/messages/${userId}`, data, { headers });
+      const response = await api.post<IMessage>(`/messages/${userId}`, data, config);
       return response.data;
     } catch (error) {
       return handleError(error as AxiosError);

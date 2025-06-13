@@ -82,6 +82,13 @@ const Messages: React.FC = () => {
     }
   };
 
+  const handleNewSocketMessage = (message: IMessage) => {
+    setMessages(prev => {
+      if (prev.some(m => m._id === message._id)) return prev;
+      return [...prev, message];
+    });
+  };
+
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }
@@ -109,6 +116,7 @@ const Messages: React.FC = () => {
               chat={selectedChat}
               messages={messages}
               onSendMessage={handleSendMessage}
+              onNewSocketMessage={handleNewSocketMessage}
             />
           ) : (
             <div className={styles.noChatSelected}>

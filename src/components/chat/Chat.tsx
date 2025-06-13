@@ -6,31 +6,25 @@ import { IChat, IMessage } from '../../types/chat';
 import { STATIC_URL } from '../../config';
 import styles from './Chat.module.css';
 import { useNavigate } from 'react-router-dom';
-import { FiImage, FiSend } from 'react-icons/fi';
 
 interface ChatProps {
   chat: IChat;
   messages: IMessage[];
   onSendMessage: (message: string, type?: 'text' | 'image', file?: File) => void;
+  onNewSocketMessage: (message: IMessage) => void;
 }
 
-export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onSendMessage }) => {
-  const [messages, setMessages] = useState<IMessage[]>(initialMessages);
+export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNewSocketMessage }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messageIds = useRef(new Set<string>());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
-      if ((message.sender._id === chat.user._id || message.receiver._id === chat.user._id) && 
-          !messageIds.current.has(message._id)) {
-        messageIds.current.add(message._id);
-        setMessages(prev => [...prev, message]);
-      }
+      onNewSocketMessage(message);
     },
     onUserTyping: (userId: string) => {
       if (chat.user._id === userId) {
@@ -59,18 +53,15 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
   };
 
   useEffect(() => {
-    if (messages.length > initialMessages.length) {
+    setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages.length, initialMessages.length]);
+    }, 0);
+  }, [messages]);
 
   useEffect(() => {
     const loadMessages = async () => {
       try {
         const chatMessages = await chatApi.getMessages(chat.user._id);
-        messageIds.current.clear();
-        chatMessages.forEach(msg => messageIds.current.add(msg._id));
-        setMessages(chatMessages);
         await chatApi.markAsRead(chat.user._id);
       } catch (error) {
         console.error('Error loading messages:', error);
@@ -111,26 +102,28 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
 
   const renderMessage = (message: IMessage) => {
     const isSent = message.sender._id !== chat.user._id;
+    const isImage = message.type === 'image';
     return (
       <div
         key={message._id}
-        className={`${styles.message} ${
-          isSent ? styles.sent : styles.received
-        }`}
+        className={`${styles.message} ${isSent ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
       >
-        <div className={styles.bubble}>
-          {message.type === 'image' ? (
+        {isImage ? (
+          <>
             <img 
               src={`${STATIC_URL}${message.content}`} 
               alt="Message attachment" 
               className={styles.messageImage}
               onClick={() => window.open(`${STATIC_URL}${message.content}`, '_blank')}
             />
-          ) : (
+            <time>{formatMessageTime(message.createdAt)}</time>
+          </>
+        ) : (
+          <div className={styles.bubble}>
             <p>{message.content}</p>
-          )}
-          <time>{formatMessageTime(message.createdAt)}</time>
-        </div>
+            <time>{formatMessageTime(message.createdAt)}</time>
+          </div>
+        )}
       </div>
     );
   };
@@ -212,14 +205,22 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages: initialMessages, onS
           className={styles.imageButton}
           title="Send image"
         >
-          <FiImage />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
         </button>
         <button
           onClick={handleSendMessage}
           disabled={!newMessage.trim()}
           className={styles.sendButton}
         >
-          <FiSend />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
         </button>
       </footer>
     </div>

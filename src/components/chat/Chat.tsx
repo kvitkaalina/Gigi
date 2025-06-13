@@ -19,6 +19,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
@@ -52,10 +53,18 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     }
   };
 
+  function isUserAtBottom(): boolean {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+  }
+
   useEffect(() => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 0);
+    if (isUserAtBottom()) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -163,7 +172,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
         </button>
       </header>
 
-      <div className={styles.messages}>
+      <div className={styles.messages} ref={messagesContainerRef}>
         {messages.map(renderMessage)}
         {isTyping && (
           <div className={styles.typing}>

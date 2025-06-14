@@ -98,7 +98,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                     className={styles.avatar}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/default-avatar.jpg';
+                      target.src = '/images/my-avatar-placeholder.png';
                     }}
                   />
                   <div className={styles.userInfo}>
@@ -129,7 +129,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                     className={styles.avatar}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/default-avatar.jpg';
+                      target.src = '/images/my-avatar-placeholder.png';
                     }}
                   />
                   {chat.user.isOnline && <div className={styles.onlineIndicator} />}
@@ -138,7 +138,9 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                   <div className={styles.chatItemName}>{chat.user.username}</div>
                   <div className={styles.lastMessage}>
                     <span className={styles.messageText}>
-                      {chat.lastMessage?.content || 'No messages yet'}
+                      {chat.lastMessage?.type === 'image'
+                        ? '🖼️ Фото'
+                        : chat.lastMessage?.content || 'No messages yet'}
                     </span>
                     {chat.lastMessage && (
                       <span className={styles.messageTime}>

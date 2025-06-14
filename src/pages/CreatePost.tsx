@@ -83,7 +83,7 @@ const CreatePost: React.FC = () => {
               <img src={preview} alt="Preview" className={styles.previewImage} />
             ) : (
               <div>
-                <span className={styles.uploadIcon}>📷</span>
+                <img src="/images/img.png" alt="Upload" className={styles.uploadIcon} />
                 <p className={styles.uploadText}>
                   Drag and drop your image here, or click to select
                 </p>

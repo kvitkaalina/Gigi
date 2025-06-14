@@ -516,7 +516,7 @@
 .commentSubmit {
   background: none;
   border: none;
-  color: #0095f6;
+  color: #3a5e63;
   font-weight: 600;
   cursor: pointer;
   padding: 0 8px;
@@ -657,7 +657,7 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background: #0095f6;
+  background: #3a5e63;
   color: white;
   border-radius: 50%;
   width: 18px;
@@ -669,7 +669,7 @@
 }
 
 .actionButton.active {
-  color: #0095f6;
+  color: #3a5e63;
 }
 
 .commentHeader {

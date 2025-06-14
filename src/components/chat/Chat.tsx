@@ -209,7 +209,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
               className={styles.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = '/default-avatar.jpg';
+                target.src = '/images/my-avatar-placeholder.png';
               }}
             />
             {chat.user.isOnline && <div className={styles.onlineIndicator} />}

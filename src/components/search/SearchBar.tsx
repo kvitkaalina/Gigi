@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import styles from './SearchBar.module.css';
-import defaultAvatar from '../../assets/default-avatar.svg';
 import { getAssetUrl } from '../../utils/urls';
 import { searchService } from '../../services';
 import type { SearchUser } from '../../services/searchService';
@@ -18,6 +17,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  const defaultAvatar = '/images/my-avatar-placeholder.png';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

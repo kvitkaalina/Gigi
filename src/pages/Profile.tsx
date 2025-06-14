@@ -7,7 +7,6 @@ import FollowList from '../components/profile/FollowList';
 import PostModal from '../components/post/PostModal';
 import PostsInfo from '../components/feed/PostsInfo';
 import styles from './Profile.module.css';
-import defaultAvatar from '../assets/default-avatar.svg';
 import { userService, postService } from '../services';
 import type { User, FollowUser } from '../services/userService';
 import type { Post, Comment } from '../services/postService';
@@ -36,6 +35,8 @@ const Profile: React.FC = () => {
   const [following, setFollowing] = useState<FollowUser[]>([]);
   const [showUnfollowDropdown, setShowUnfollowDropdown] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
+
+  const defaultAvatar = '/images/my-avatar-placeholder.png';
 
   useEffect(() => {
     if (username) {
@@ -253,6 +254,10 @@ const Profile: React.FC = () => {
                 src={user.avatar ? `http://localhost:5001${user.avatar}` : defaultAvatar} 
                 alt={user.username} 
                 className={styles.avatar}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = defaultAvatar;
+                }}
               />
               {isOwnProfile && (
                 <label className={styles.changeAvatarButton}>

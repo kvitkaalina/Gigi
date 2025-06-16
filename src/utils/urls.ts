@@ -9,9 +9,9 @@ export const getApiUrl = (path: string): string => {
 };
 
 export const getAssetUrl = (path: string | undefined | null): string => {
-  if (!path || path === 'default-avatar.jpg' || !path.startsWith('/uploads/')) {
-    return '/images/my-avatar-placeholder.png';
-  }
+  if (!path) return '/default-avatar.svg';
   const baseUrl = process.env.REACT_APP_ASSETS_URL || 'http://localhost:5001';
-  return `${baseUrl}${path}`;
+  // Убираем дублирование /uploads в пути
+  const cleanPath = path.startsWith('/uploads/') ? path : `/uploads${path}`;
+  return `${baseUrl}${cleanPath}`;
 }; 

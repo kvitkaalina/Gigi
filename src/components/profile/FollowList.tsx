@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FollowList.module.css';
-import defaultAvatar from '../../assets/default-avatar.svg';
 
 interface User {
   _id: string;
@@ -44,9 +43,13 @@ const FollowList: React.FC<FollowListProps> = ({ users, title, onClose }) => {
                 onClick={() => handleUserClick(user.username)}
               >
                 <img 
-                  src={user.avatar ? `http://localhost:5001${user.avatar}` : defaultAvatar}
+                  src={user.avatar ? `http://localhost:5001${user.avatar}` : '/images/my-avatar-placeholder.png'}
                   alt={user.username}
                   className={styles.avatar}
+                  onError={e => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/images/my-avatar-placeholder.png';
+                  }}
                 />
                 <div className={styles.userInfo}>
                   <span className={styles.username}>{user.username}</span>

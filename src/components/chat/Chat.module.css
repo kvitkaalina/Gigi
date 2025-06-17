@@ -260,6 +260,8 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
   position: absolute;
   top: 8px;
+  width: 16px;
+  height: 16px;
 }
 
 .editButton {
@@ -283,8 +285,8 @@
 
 .editButton svg,
 .deleteButton svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   fill: none;
   stroke: #8e8e8e;
   stroke-width: 2;
@@ -339,20 +341,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .editInput {
   flex: 1;
-  padding: 8px;
+  width: 100%;
+  min-height: 36px;
+  max-height: 120px;
+  resize: none;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s ease;
+  padding: 8px;
+  transition: border-color 0.2s;
+  overflow-y: auto;
 }
 
 .editInput:focus {
   border-color: #00a884;
+  box-shadow: 0 0 0 2px #00a88422;
 }
 
 .messageControls {
@@ -393,4 +402,13 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.bubble.editing {
+  padding-right: 16px;
+}
+
+.postCommentButton:disabled {
+  color: #b2f6fe ;
+  cursor: default;
 } 

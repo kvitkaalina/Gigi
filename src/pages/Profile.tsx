@@ -37,8 +37,6 @@ const Profile: React.FC = () => {
   const [showUnfollowDropdown, setShowUnfollowDropdown] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
 
-  const defaultAvatar = '/images/my-avatar-placeholder.png';
-
   useEffect(() => {
     if (username) {
       fetchUserProfile();
@@ -260,12 +258,12 @@ const Profile: React.FC = () => {
           <div className={styles.avatarSection}>
             <div className={styles.avatarContainer}>
               <img 
-                src={user.avatar ? `http://localhost:5001${user.avatar}` : defaultAvatar} 
+                src={user.avatar ? `http://localhost:5001${user.avatar}` : '/images/my-avatar-placeholder.png'} 
                 alt={user.username} 
                 className={styles.avatar}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = defaultAvatar;
+                  target.src = '/images/my-avatar-placeholder.png';
                 }}
               />
               {isOwnProfile && (

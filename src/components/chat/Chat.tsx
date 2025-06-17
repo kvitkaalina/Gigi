@@ -6,6 +6,7 @@ import { IChat, IMessage } from '../../types/chat';
 import { STATIC_URL } from '../../config';
 import styles from './Chat.module.css';
 import { useNavigate } from 'react-router-dom';
+import Picker from '@emoji-mart/react';
 
 interface ChatProps {
   chat: IChat;
@@ -28,6 +29,9 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const socketRef = useRef<any>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
@@ -128,8 +132,12 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     setEditingValue(message.content);
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditingValue(e.target.value);
+    if (editInputRef.current) {
+      editInputRef.current.style.height = 'auto';
+      editInputRef.current.style.height = editInputRef.current.scrollHeight + 'px';
+    }
   };
 
   const handleEditSave = async (messageId: string) => {
@@ -167,9 +175,25 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     setEditingValue('');
   };
 
+  const handleEmojiSelect = (emoji: any) => {
+    if (!inputRef.current) return;
+    const input = inputRef.current;
+    const start = input.selectionStart || 0;
+    const end = input.selectionEnd || 0;
+    const emojiChar = emoji.native || '';
+    const newValue = newMessage.slice(0, start) + emojiChar + newMessage.slice(end);
+    setNewMessage(newValue);
+    setShowEmojiPicker(false);
+    setTimeout(() => {
+      input.focus();
+      input.selectionStart = input.selectionEnd = start + emojiChar.length;
+    }, 0);
+  };
+
   const renderMessage = (message: IMessage) => {
     const isOwn = message.sender._id === currentUserId;
     const isImage = message.type === 'image';
+    const isEditing = editingId === message._id;
     return (
       <div
         key={message._id}
@@ -190,14 +214,16 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
             )}
           </>
         ) : (
-          <div className={styles.bubble}>
-            {editingId === message._id ? (
+          <div className={`${styles.bubble} ${isEditing ? styles.editing : ''}`}>
+            {isEditing ? (
               <div className={styles.editContainer}>
-                <input
+                <textarea
+                  ref={editInputRef}
                   className={styles.editInput}
                   value={editingValue}
                   onChange={handleEditChange}
                   autoFocus
+                  rows={1}
                 />
                 <div className={styles.editButtons}>
                   <button className={styles.saveButton} onClick={() => handleEditSave(message._id)} title="Save">
@@ -291,23 +317,40 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
       </div>
 
       <footer className={styles.footer}>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => {
-            setNewMessage(e.target.value);
-            startTyping(chat.user._id);
-            setTimeout(() => stopTyping(chat.user._id), 1000);
-          }}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendMessage();
-            }
-          }}
-          placeholder="Type a message..."
-          className={styles.input}
-        />
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1 }}>
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker(v => !v)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: 8, fontSize: 22 }}
+            tabIndex={-1}
+          >
+            <span role="img" aria-label="emoji">😊</span>
+          </button>
+          {showEmojiPicker && (
+            <div style={{ position: 'absolute', bottom: '48px', left: 0, zIndex: 10 }}>
+              <Picker onEmojiSelect={handleEmojiSelect} theme="light" />
+            </div>
+          )}
+          <input
+            ref={inputRef}
+            type="text"
+            value={newMessage}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              startTyping(chat.user._id);
+              setTimeout(() => stopTyping(chat.user._id), 1000);
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            placeholder="Type a message..."
+            className={styles.input}
+            style={{ flex: 1 }}
+          />
+        </div>
         <input
           type="file"
           ref={fileInputRef}

@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
 import styles from './Home.module.css';
-import defaultAvatar from '../assets/default-avatar.svg';
 import defaultPost from '../assets/default-post.svg';
 import EndOfFeed from '../components/feed/EndOfFeed';
 import PostsInfo from '../components/feed/PostsInfo';
 import { API_BASE_URL, getAuthHeaders } from '../services/config';
 import type { Post, Comment } from '../services/postService';
 import { commentService } from '../services/commentService';
+import Picker from '@emoji-mart/react';
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -28,6 +28,11 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [doubleTapLike, setDoubleTapLike] = useState<string | null>(null);
   const [updatingLikes, setUpdatingLikes] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState<{[postId: string]: boolean}>({});
+  const inputRefs = useRef<{[postId: string]: HTMLInputElement | null}>({});
+  const [emojiPickerCoords, setEmojiPickerCoords] = useState<{[postId: string]: {left: number, top: number} | null}>({});
+  const emojiButtonRefs = useRef<{[postId: string]: HTMLButtonElement | null}>({});
+  const pickerHeight = 370; // Примерная высота emoji-пикера
 
   const fetchPosts = useCallback(async (pageNum: number = 1, isPreload: boolean = false) => {
     try {
@@ -315,6 +320,44 @@ const Home: React.FC = () => {
     navigate(`/profile/${username}`);
   };
 
+  const handleEmojiSelect = (postId: string, emoji: any) => {
+    const input = inputRefs.current[postId];
+    if (!input) return;
+    const start = input.selectionStart || 0;
+    const end = input.selectionEnd || 0;
+    const emojiChar = emoji.native || '';
+    const value = newComments[postId] || '';
+    const newValue = value.slice(0, start) + emojiChar + value.slice(end);
+    setNewComments(prev => ({ ...prev, [postId]: newValue }));
+    setShowEmojiPicker(prev => ({ ...prev, [postId]: false }));
+    setTimeout(() => {
+      input.focus();
+      input.selectionStart = input.selectionEnd = start + emojiChar.length;
+    }, 0);
+  };
+
+  const handleEmojiButtonClick = (postId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmojiPicker(prev => ({ ...prev, [postId]: !prev[postId] }));
+    if (!showEmojiPicker[postId]) {
+      const btn = emojiButtonRefs.current[postId];
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        let top = rect.bottom + 6;
+        if (window.innerHeight - rect.bottom < pickerHeight) {
+          top = rect.top - pickerHeight - 6;
+        }
+        setEmojiPickerCoords(prev => ({
+          ...prev,
+          [postId]: {
+            left: rect.left,
+            top
+          }
+        }));
+      }
+    }
+  };
+
   const renderComment = (post: Post, comment: Comment) => {
     const userId = localStorage.getItem('userId');
     if (!comment || !comment.user) return null;
@@ -323,12 +366,12 @@ const Home: React.FC = () => {
       <div key={comment._id} className={styles.comment}>
         <div className={styles.commentContent}>
           <img 
-            src={comment.user?.avatar ? `http://localhost:5001${comment.user.avatar}` : defaultAvatar}
+            src={comment.user?.avatar ? `http://localhost:5001${comment.user.avatar}` : '/images/my-avatar-placeholder.png'}
             alt={comment.user?.username || 'User'}
             className={styles.commentAvatar}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = defaultAvatar;
+              target.src = '/images/my-avatar-placeholder.png';
             }}
           />
           <div className={styles.commentText}>
@@ -379,14 +422,14 @@ const Home: React.FC = () => {
       <div key={post._id} className={styles.post}>
         <div className={styles.postHeader}>
           <img 
-            src={post.author?.avatar ? `http://localhost:5001${post.author.avatar}` : defaultAvatar} 
+            src={post.author?.avatar ? `http://localhost:5001${post.author.avatar}` : '/images/my-avatar-placeholder.png'} 
             alt={post.author?.username || 'User'} 
             className={styles.avatar}
             onClick={(e) => post.author?.username && handleUsernameClick(post.author.username, e)}
             style={{ cursor: 'pointer' }}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = defaultAvatar;
+              target.src = '/images/my-avatar-placeholder.png';
             }}
           />
           <span 
@@ -462,7 +505,31 @@ const Home: React.FC = () => {
             </>
           )}
 
-          <div className={`${styles.addComment} ${isCommentFormActive ? styles.visible : ''}`}>
+          <div className={`${styles.addComment} ${isCommentFormActive ? styles.visible : ''}`} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className={styles.emojiButton}
+              ref={el => (emojiButtonRefs.current[post._id] = el)}
+              onClick={e => handleEmojiButtonClick(post._id, e)}
+              tabIndex={-1}
+              style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', marginRight: 8 }}
+              aria-label="Add emoji"
+            >
+              😊
+            </button>
+            {showEmojiPicker[post._id] && emojiPickerCoords[post._id] && (
+              <div style={{
+                position: 'fixed',
+                left: emojiPickerCoords[post._id]!.left,
+                top: emojiPickerCoords[post._id]!.top,
+                zIndex: 9999,
+                boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+                borderRadius: 16,
+                background: '#fff'
+              }}>
+                <Picker onEmojiSelect={emoji => handleEmojiSelect(post._id, emoji)} theme="light" />
+              </div>
+            )}
             <input
               type="text"
               placeholder="Add a comment..."
@@ -477,6 +544,8 @@ const Home: React.FC = () => {
                 }
               }}
               className={styles.commentInput}
+              ref={el => (inputRefs.current[post._id] = el)}
+              onBlur={() => setTimeout(() => setShowEmojiPicker(prev => ({ ...prev, [post._id]: false })), 200)}
             />
             <button
               onClick={() => handleCommentSubmit(post._id)}

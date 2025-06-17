@@ -343,6 +343,23 @@
   cursor: default;
 }
 
+.postCommentButton {
+  background: none;
+  border: none;
+  color: #3a5e63;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+.postCommentButton:disabled {
+  color: #b3dbf6;
+  cursor: default;
+}
+
 @media screen and (max-width: 1200px) {
   .modal {
     width: 95%;

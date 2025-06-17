@@ -4,7 +4,6 @@ import { notificationService, Notification } from '../../services/notificationSe
 import { API_BASE_URL } from '../../services/config';
 import { getAssetUrl } from '../../utils/urls';
 import styles from './NotificationList.module.css';
-import defaultAvatar from '../../assets/default-avatar.svg';
 import { formatDistanceToNow } from 'date-fns';
 
 const NotificationList: React.FC = () => {
@@ -172,12 +171,12 @@ const NotificationList: React.FC = () => {
             >
               <div className={styles.notificationContent}>
                 <img 
-                  src={notification.actor?.avatar ? getAssetUrl(notification.actor.avatar) : defaultAvatar}
+                  src={notification.actor?.avatar ? getAssetUrl(notification.actor.avatar) : '/images/my-avatar-placeholder.png'}
                   alt={notification.actor?.fullName || notification.actor?.username || 'User'}
                   className={styles.avatar}
                   onError={(e) => {
                     console.error('Failed to load actor avatar');
-                    e.currentTarget.src = defaultAvatar;
+                    e.currentTarget.src = '/images/my-avatar-placeholder.png';
                   }}
                 />
                 <div className={styles.notificationText}>
@@ -199,7 +198,7 @@ const NotificationList: React.FC = () => {
                     className={styles.postThumbnail}
                     onError={(e) => {
                       console.error('Failed to load notification image');
-                      e.currentTarget.src = defaultAvatar;
+                      e.currentTarget.src = '/images/my-avatar-placeholder.png';
                     }}
                   />
                   <button

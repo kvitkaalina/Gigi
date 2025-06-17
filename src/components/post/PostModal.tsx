@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './PostModal.module.css';
-import defaultAvatar from '../../assets/default-avatar.svg';
 import { likeService, postService, commentService } from '../../services';
 import type { Post, Comment } from '../../services/postService';
 import { API_BASE_URL } from '../../services/config';
+import Picker from '@emoji-mart/react';
 
 interface PostModalProps {
   post: Post;
@@ -34,6 +34,12 @@ const PostModal: React.FC<PostModalProps> = ({
   const commentsSectionRef = useRef<HTMLDivElement>(null);
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | undefined>(focusedCommentId);
   const [isHighlightFading, setIsHighlightFading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [emojiPickerCoords, setEmojiPickerCoords] = useState<{left: number, top: number} | null>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const pickerHeight = 370; // Примерная высота emoji-пикера
 
   useEffect(() => {
     if (post?._id) {
@@ -160,6 +166,37 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
+  const handleEmojiSelect = (emoji: any) => {
+    if (!inputRef.current) return;
+    const input = inputRef.current;
+    const start = input.selectionStart || 0;
+    const end = input.selectionEnd || 0;
+    const emojiChar = emoji.native || '';
+    const newValue = newComment.slice(0, start) + emojiChar + newComment.slice(end);
+    setNewComment(newValue);
+    setShowEmojiPicker(false);
+    setTimeout(() => {
+      input.focus();
+      input.selectionStart = input.selectionEnd = start + emojiChar.length;
+    }, 0);
+  };
+
+  const handleEmojiButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmojiPicker(v => !v);
+    if (!showEmojiPicker && emojiButtonRef.current) {
+      const rect = emojiButtonRef.current.getBoundingClientRect();
+      let top = rect.bottom + 6;
+      if (window.innerHeight - rect.bottom < pickerHeight) {
+        top = rect.top - pickerHeight - 6;
+      }
+      setEmojiPickerCoords({
+        left: rect.left,
+        top
+      });
+    }
+  };
+
   return (
     <div 
       className={`${styles.overlay} ${isStandalone ? styles.standalone : ''}`}
@@ -168,11 +205,11 @@ const PostModal: React.FC<PostModalProps> = ({
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.imageSection}>
           <img
-            src={post.image ? `${API_BASE_URL}${post.image}` : defaultAvatar}
+            src={post.image ? `${API_BASE_URL}${post.image}` : '/images/my-avatar-placeholder.png'}
             alt={`Post by ${post.author?.username}`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = defaultAvatar;
+              target.src = '/images/my-avatar-placeholder.png';
             }}
           />
         </div>
@@ -180,7 +217,7 @@ const PostModal: React.FC<PostModalProps> = ({
           <div className={styles.header}>
             <div className={styles.authorInfo}>
               <img
-                src={post.author?.avatar ? `${API_BASE_URL}${post.author.avatar}` : defaultAvatar}
+                src={post.author?.avatar ? `${API_BASE_URL}${post.author.avatar}` : '/images/my-avatar-placeholder.png'}
                 alt={post.author?.username}
                 className={styles.avatar}
                 onClick={(e) => handleCommentClick(post.author.username, e)}
@@ -223,7 +260,7 @@ const PostModal: React.FC<PostModalProps> = ({
               >
                 <div className={styles.commentContent}>
                   <img
-                    src={comment.user?.avatar ? `${API_BASE_URL}${comment.user.avatar}` : defaultAvatar}
+                    src={comment.user?.avatar ? `${API_BASE_URL}${comment.user.avatar}` : '/images/my-avatar-placeholder.png'}
                     alt={comment.user?.username}
                     className={styles.commentAvatar}
                   />
@@ -264,18 +301,44 @@ const PostModal: React.FC<PostModalProps> = ({
             </span>
           </div>
 
-          <form className={styles.commentForm} onSubmit={handleComment}>
+          <form className={styles.commentForm} onSubmit={handleComment} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className={styles.emojiButton}
+              ref={emojiButtonRef}
+              onClick={handleEmojiButtonClick}
+              tabIndex={-1}
+              style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', marginRight: 8 }}
+              aria-label="Add emoji"
+            >
+              😊
+            </button>
+            {showEmojiPicker && emojiPickerCoords && (
+              <div style={{
+                position: 'fixed',
+                left: emojiPickerCoords.left,
+                top: emojiPickerCoords.top,
+                zIndex: 9999,
+                boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+                borderRadius: 16,
+                background: '#fff'
+              }}>
+                <Picker onEmojiSelect={handleEmojiSelect} theme="light" />
+              </div>
+            )}
             <input
               type="text"
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className={styles.commentInput}
+              ref={inputRef}
+              onBlur={() => setTimeout(() => setShowEmojiPicker(false), 200)}
             />
             <button
               type="submit"
               disabled={!newComment.trim() || isSubmitting}
-              className={styles.postComment}
+              className={styles.postCommentButton}
             >
               {isSubmitting ? 'Posting...' : 'Post'}
             </button>

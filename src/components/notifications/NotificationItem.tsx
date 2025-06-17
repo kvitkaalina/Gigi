@@ -1,7 +1,6 @@
 import React from 'react';
 import { usePostModalContext } from '../post/PostModalProvider';
 import { postService } from '../../services';
-import defaultAvatar from '../../assets/default-avatar.svg';
 import { API_BASE_URL } from '../../services/config';
 import styles from './NotificationItem.module.css';
 
@@ -55,7 +54,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRea
       onClick={handleClick}
     >
       <img
-        src={notification.user.avatar ? `${API_BASE_URL}${notification.user.avatar}` : defaultAvatar}
+        src={notification.user.avatar ? `${API_BASE_URL}${notification.user.avatar}` : '/images/my-avatar-placeholder.png'}
         alt={notification.user.username}
         className={styles.avatar}
       />

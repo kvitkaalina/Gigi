@@ -13,6 +13,7 @@ export interface IMessage {
   sender: IUser;
   receiver: IUser;
   createdAt: string;
+  updatedAt?: string;
   read: boolean;
   type?: 'text' | 'image';
 }

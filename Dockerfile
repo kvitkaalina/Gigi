@@ -10,7 +10,7 @@ RUN npm install --legacy-peer-deps
 # Копируем весь проект в рабочую директорию контейнера
 COPY . .
 # Открываем порт 5173 - стандартный порт для Vite
-EXPOSE 5173
+EXPOSE 5174
 # Запускаем dev-сервер Vite с помощью скрипта "devdocker"
 # В package.json должке быть скрипт: "devdocker": "vite"
 CMD [ "npm", "run", "devdocker" ]

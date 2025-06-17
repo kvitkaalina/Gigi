@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../../config';
 import AuthService from '../../utils/auth';
 import styles from './ResetPassword.module.css';
 
@@ -24,15 +24,9 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:5001/api/auth/reset-password/${token}`,
-        { password },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
+      const response = await api.post(
+        `/auth/reset-password/${token}`,
+        { password }
       );
       
       // Если сервер вернул токен и данные пользователя, сохраняем их

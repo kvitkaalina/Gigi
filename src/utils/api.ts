@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-const API_BASE = process.env.REACT_APP_API_BASE || '/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 // Создаем экземпляр axios с базовым URL
 const api = axios.create({

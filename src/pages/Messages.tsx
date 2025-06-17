@@ -83,7 +83,12 @@ const Messages: React.FC = () => {
   };
 
   const handleNewSocketMessage = (message: IMessage) => {
+    const isUpdate = messages.some(m => m._id === message._id);
+    
     setMessages(prev => {
+      if (isUpdate) {
+        return prev.map(m => m._id === message._id ? message : m);
+      }
       if (prev.some(m => m._id === message._id)) return prev;
       return [...prev, message];
     });

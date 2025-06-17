@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     <div className={styles.loginPage}>
       <div className={styles.loginBox}>
         <h1 className={styles.logo}>GiGi</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form} autoComplete="off">
           <div className={styles.formGroup}>
             <input
               type="text"
@@ -68,6 +68,7 @@ const Login: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              autoComplete="username"
             />
           </div>
           <div className={styles.formGroup}>
@@ -78,6 +79,7 @@ const Login: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              autoComplete="current-password"
             />
           </div>
           {error && <div className={styles.error}>{error}</div>}

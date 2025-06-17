@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import DeletePostModal from '../components/profile/DeletePostModal';
@@ -19,6 +19,7 @@ interface PostModalProps {
 
 const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -237,6 +238,14 @@ const Profile: React.FC = () => {
     });
   };
 
+  const handleMessagesClick = () => {
+    if (user) {
+      navigate(`/messages?user=${user._id}`);
+    }
+  };
+
+  console.log('currentUserId:', currentUserId, 'user._id:', user && user._id);
+
   if (isLoading) return <div className={styles.loading}>Loading...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
   if (!user) return <div className={styles.error}>User not found</div>;
@@ -284,12 +293,20 @@ const Profile: React.FC = () => {
                   Edit Profile
                 </button>
               ) : (
-                <button 
-                  className={`${styles.followButton} ${isFollowing ? styles.following : ''}`}
-                  onClick={handleFollow}
-                >
-                  <span>{isFollowing ? 'Following' : 'Follow'}</span>
-                </button>
+                <div className={styles.actions}>
+                  <button
+                    onClick={handleFollow}
+                    className={`${styles.followButton} ${isFollowing ? styles.following : ''}`}
+                  >
+                    <span>{isFollowing ? 'Following' : 'Follow'}</span>
+                  </button>
+                  <button
+                    onClick={handleMessagesClick}
+                    className={styles.messageButton}
+                  >
+                    Messages
+                  </button>
+                </div>
               )}
             </div>
 

@@ -3,7 +3,7 @@ import { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 import { IMessage } from '../types/chat';
 
-const SOCKET_URL = 'http://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 interface IUserStatus {
   userId: string;
@@ -75,6 +75,10 @@ export const useSocket = (props: UseSocketProps) => {
         type: message.type || 'text',
         read: message.read ?? false
       });
+    });
+
+    socket.on('messageEdited', (message: IMessage) => {
+      onNewMessage(message); // Используем тот же обработчик, что и для новых сообщений
     });
 
     socket.on('userTyping', onUserTyping);

@@ -93,7 +93,7 @@ const Register: React.FC = () => {
           <form 
             onSubmit={handleSubmit} 
             className={styles['register-form']}
-            autoComplete="off"
+            autoComplete="on"
             lang="en"
             noValidate
           >
@@ -105,7 +105,7 @@ const Register: React.FC = () => {
               onChange={handleChange}
               className={styles['form-input']}
               required
-              autoComplete="off"
+              autoComplete="email"
               pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
               title="Please enter a valid email address"
             />
@@ -117,7 +117,7 @@ const Register: React.FC = () => {
               onChange={handleChange}
               className={styles['form-input']}
               required
-              autoComplete="off"
+              autoComplete="name"
               minLength={2}
               title="Please enter your full name (minimum 2 characters)"
             />
@@ -129,7 +129,7 @@ const Register: React.FC = () => {
               onChange={handleChange}
               className={styles['form-input']}
               required
-              autoComplete="off"
+              autoComplete="username"
               minLength={3}
               pattern="^[a-zA-Z0-9._]+$"
               title="Username can only contain letters, numbers, dots and underscores"

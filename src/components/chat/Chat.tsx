@@ -13,9 +13,10 @@ interface ChatProps {
   onSendMessage: (message: string, type?: 'text' | 'image', file?: File) => void;
   onNewSocketMessage: (message: IMessage) => void;
   onDeleteMessage: (messageId: string) => void;
+  onUpdateMessage?: (messageId: string, content: string) => void;
 }
 
-export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNewSocketMessage, onDeleteMessage }) => {
+export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNewSocketMessage, onDeleteMessage, onUpdateMessage }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -26,6 +27,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const currentUserId = localStorage.getItem('userId');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
+  const socketRef = useRef<any>(null);
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
@@ -46,15 +48,23 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     }
   });
 
-  const formatMessageTime = (date: string): string => {
-    const messageDate = new Date(date);
+  const formatMessageTime = (message: IMessage): string => {
+    const messageDate = new Date(message.createdAt);
+    let timeStr = '';
+    
     if (isToday(messageDate)) {
-      return format(messageDate, 'HH:mm');
+      timeStr = format(messageDate, 'HH:mm');
     } else if (isYesterday(messageDate)) {
-      return 'Yesterday ' + format(messageDate, 'HH:mm');
+      timeStr = 'Yesterday ' + format(messageDate, 'HH:mm');
     } else {
-      return format(messageDate, 'MMM d HH:mm');
+      timeStr = format(messageDate, 'MMM d HH:mm');
     }
+    
+    if (message.updatedAt) {
+      timeStr += ' (edited)';
+    }
+    
+    return timeStr;
   };
 
   function isUserAtBottom(): boolean {
@@ -123,12 +133,31 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   };
 
   const handleEditSave = async (messageId: string) => {
+    if (!editingValue.trim()) return;
+    
     try {
+      // Сначала отправляем изменения на сервер
       await chatApi.editMessage(messageId, editingValue);
+      
+      // Находим сообщение для обновления
+      const messageToUpdate = messages.find(m => m._id === messageId);
+      if (messageToUpdate) {
+        // Создаем обновленное сообщение
+        const updatedMessage = {
+          ...messageToUpdate,
+          content: editingValue,
+          updatedAt: new Date().toISOString() // Добавляем время обновления
+        };
+        
+        // Отправляем обновленное сообщение через socket для синхронизации
+        onNewSocketMessage(updatedMessage);
+      }
+      
+      // Сбрасываем состояние редактирования
       setEditingId(null);
       setEditingValue('');
-      // Не обновляем сообщения локально, ждем обновления от родителя
     } catch (error) {
+      console.error('Error editing message:', error);
       alert('Ошибка при редактировании сообщения');
     }
   };
@@ -140,12 +169,11 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
 
   const renderMessage = (message: IMessage) => {
     const isOwn = message.sender._id === currentUserId;
-    const isSent = !isOwn;
     const isImage = message.type === 'image';
     return (
       <div
         key={message._id}
-        className={`${styles.message} ${isSent ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
+        className={`${styles.message} ${isOwn ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
         style={{ position: 'relative' }}
       >
         {isImage ? (
@@ -156,36 +184,57 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
               className={styles.messageImage}
               onClick={() => window.open(`${STATIC_URL}${message.content}`, '_blank')}
             />
-            <time>{formatMessageTime(message.createdAt)}</time>
+            <time>{formatMessageTime(message)}</time>
             {isOwn && (
               <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
             )}
           </>
         ) : (
-          <div className={styles.bubble} style={{ position: 'relative' }}>
+          <div className={styles.bubble}>
             {editingId === message._id ? (
-              <>
+              <div className={styles.editContainer}>
                 <input
                   className={styles.editInput}
                   value={editingValue}
                   onChange={handleEditChange}
                   autoFocus
                 />
-                <button className={styles.saveButton} onClick={() => handleEditSave(message._id)} title="Save">✔</button>
-                <button className={styles.cancelButton} onClick={handleEditCancel} title="Cancel">✖</button>
-              </>
+                <div className={styles.editButtons}>
+                  <button className={styles.saveButton} onClick={() => handleEditSave(message._id)} title="Save">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </button>
+                  <button className={styles.cancelButton} onClick={handleEditCancel} title="Cancel">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M18 6L6 18" />
+                      <path d="M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
                 <p>{message.content}</p>
-                <div className={styles.timeEditRow}>
-                  <time>{formatMessageTime(message.createdAt)}</time>
-                  {isOwn && (
-                    <button className={styles.editButton} onClick={() => handleEditClick(message)} title="Edit message">✎</button>
-                  )}
-                </div>
                 {isOwn && (
-                  <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+                  <>
+                    <button className={styles.editButton} onClick={() => handleEditClick(message)} title="Edit message">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                    <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M18 6L6 18" />
+                        <path d="M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </>
                 )}
+                <div className={styles.messageControls}>
+                  <time>{formatMessageTime(message)}</time>
+                </div>
               </>
             )}
           </div>

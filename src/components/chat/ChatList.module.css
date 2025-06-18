@@ -144,6 +144,7 @@
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
+  margin-right: 10px;
 }
 
 .userInfo {
@@ -204,6 +205,7 @@
 .chatItemAvatar {
   position: relative;
   flex-shrink: 0;
+  margin-right: 10px;
 }
 
 .chatItemAvatar img {
@@ -279,5 +281,74 @@
   margin: 0 0 0 0;
   border-radius: 0;
   background: none;
+}
+
+/* Мобильные стили */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .chatList {
+    width: 100%;
+    min-width: 100%;
+    padding-bottom: 60px;
+    box-sizing: border-box;
+  }
+  .chatItem {
+    gap: 14px;
+    padding: 14px 10px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .avatar {
+    width: 48px;
+    height: 48px;
+  }
+  .chatItemAvatar {
+    width: 48px;
+    height: 48px;
+  }
+  .chatItemName {
+    font-size: 15px;
+  }
+  .lastMessage, .messageText {
+    font-size: 13px;
+  }
+  .messageTime {
+    font-size: 12px;
+  }
+  .unreadCount {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatItem {
+    gap: 10px;
+    padding: 10px 6px;
+  }
+  .avatar, .chatItemAvatar {
+    width: 40px;
+    height: 40px;
+  }
+  .chatItemName {
+    font-size: 14px;
+  }
+  .lastMessage, .messageText {
+    font-size: 12px;
+  }
+  .messageTime {
+    font-size: 11px;
+  }
+  .unreadCount {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
 }
 

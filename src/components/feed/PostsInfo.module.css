@@ -31,10 +31,21 @@
   font-size: 12px;
 }
 
+@media (max-width: 768px) {
+  .navigation, .copyright {
+    display: none !important;
+  }
+  
+  .postsInfo {
+    padding: 20px 16px;
+    margin-top: 20px;
+  }
+}
+
 @media (max-width: 480px) {
   .postsInfo {
-    padding: 24px 16px;
-    margin-top: 24px;
+    padding: 16px 12px;
+    margin-top: 16px;
   }
 
   .navigation {

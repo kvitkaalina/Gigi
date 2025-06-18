@@ -339,24 +339,151 @@
   }
 }
 
-@media (max-width: 735px) {
+@media (max-width: 768px) {
+  .profilePage {
+    padding-left: 0;
+    padding-bottom: 80px; /* Место для мобильной навигации */
+  }
+  
+  .main {
+    padding: 20px 16px;
+    padding-bottom: 80px;
+  }
+  
   .profileHeader {
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 0 20px;
+    padding: 16px 8px 0 8px;
+    margin-bottom: 12px;
+    gap: 4px;
   }
 
   .avatarSection {
-    margin: 0 0 20px;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
   }
 
-  .stats {
+  .avatar {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 2px;
+  }
+
+  .changeAvatarButton {
+    margin: 0;
+    margin-top: 4px;
+    width: auto;
+    min-width: 0;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .fullName, .username {
+    font-size: 20px;
+    margin-bottom: 4px;
+    margin-top: 0;
+  }
+
+  .profileInfo, .username, .fullName, h1 {
+    margin-top: 0 !important;
+  }
+
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .bioSection {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .profileActions {
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 10px;
     justify-content: center;
   }
 
+  .editButton, .followButton, .messageButton {
+    font-size: 13px;
+    padding: 7px 12px;
+    min-width: unset;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .stats {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
   .postsGrid {
-    gap: 3px;
-    padding: 0 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 16px 12px;
+    padding-bottom: 80px;
+  }
+  
+  .profileHeader {
+    padding: 0 12px;
+  }
+  
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .fullName, .username {
+    font-size: 18px;
+  }
+  
+  .editButton, .followButton, .messageButton {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .stats {
+    font-size: 12px;
+    gap: 10px;
+  }
+  
+  .postsGrid {
+    gap: 4px;
+    padding: 0 2px;
+  }
+  
+  .statButton {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .bio {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 769px) {
+  .avatar {
+    width: 120px;
+    height: 120px;
   }
 }

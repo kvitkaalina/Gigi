@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import styles from './Home.module.css';
 import defaultPost from '../assets/default-post.svg';
 import EndOfFeed from '../components/feed/EndOfFeed';
@@ -604,6 +605,7 @@ const Home: React.FC = () => {
   return (
     <div className={styles.homeContainer}>
       <Sidebar />
+      <MobileNav />
       <div className={styles.content}>
         {error && <div className={styles.error}>{error}</div>}
         {loading && posts.length === 0 ? (

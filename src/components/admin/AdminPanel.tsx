@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '../../services/adminService';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../navigation/Sidebar';
+import MobileNav from '../navigation/MobileNav';
 import styles from './AdminPanel.module.css';
 
 interface User {
@@ -65,55 +67,59 @@ const AdminPanel: React.FC = () => {
 
     return (
         <div className={styles.adminPanel}>
-            <button className={styles.backButton} onClick={handleBack}>
-                <i className="fas fa-arrow-left"></i>
-                Back
-            </button>
-            <h1>Admin Panel</h1>
-            <div className={styles.userList}>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr key={user._id}>
-                                <td>{user.username}</td>
-                                <td>{user.email}</td>
-                                <td>
-                                    <span className={user.isBlocked ? styles.blocked : styles.active}>
-                                        {user.isBlocked ? 'Blocked' : 'Active'}
-                                    </span>
-                                </td>
-                                <td>{user.role}</td>
-                                <td>
-                                    {user.role !== 'admin' && (
-                                        <>
-                                            <button
-                                                onClick={() => handleToggleBlock(user._id)}
-                                                className={user.isBlocked ? styles.unblock : styles.block}
-                                            >
-                                                {user.isBlocked ? 'Unblock' : 'Block'}
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteUser(user._id)}
-                                                className={styles.delete}
-                                            >
-                                                Delete
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
+            <Sidebar />
+            <MobileNav />
+            <div className={styles.adminContent}>
+                <button className={styles.backButton} onClick={handleBack}>
+                    <i className="fas fa-arrow-left"></i>
+                    Back
+                </button>
+                <h1>Admin Panel</h1>
+                <div className={styles.userList}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Role</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user._id}>
+                                    <td>{user.username}</td>
+                                    <td>{user.email}</td>
+                                    <td>
+                                        <span className={user.isBlocked ? styles.blocked : styles.active}>
+                                            {user.isBlocked ? 'Blocked' : 'Active'}
+                                        </span>
+                                    </td>
+                                    <td>{user.role}</td>
+                                    <td>
+                                        {user.role !== 'admin' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleToggleBlock(user._id)}
+                                                    className={user.isBlocked ? styles.unblock : styles.block}
+                                                >
+                                                    {user.isBlocked ? 'Unblock' : 'Block'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(user._id)}
+                                                    className={styles.delete}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

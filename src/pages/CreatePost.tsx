@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import styles from './CreatePost.module.css';
 import { postService } from '../services';
 
@@ -64,54 +66,60 @@ const CreatePost: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.createPostCard}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Create New Post</h1>
-          <button onClick={handleBack} className={styles.backButton}>
-            Back →
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div
-            className={styles.uploadArea}
-            onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {preview ? (
-              <img src={preview} alt="Preview" className={styles.previewImage} />
-            ) : (
-              <div>
-                <img src="/images/img.png" alt="Upload" className={styles.uploadIcon} />
-                <p className={styles.uploadText}>
-                  Drag and drop your image here, or click to select
-                </p>
+    <div className={styles.createPost}>
+      <Sidebar />
+      <MobileNav />
+      <div className={styles.main}>
+        <div className={styles.container}>
+          <div className={styles.createPostCard}>
+            <div className={styles.header}>
+              <h1 className={styles.title}>Create New Post</h1>
+              <button onClick={handleBack} className={styles.backButton}>
+                Back →
+              </button>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div
+                className={styles.uploadArea}
+                onDrop={handleDrop}
+                onDragOver={(e) => e.preventDefault()}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {preview ? (
+                  <img src={preview} alt="Preview" className={styles.previewImage} />
+                ) : (
+                  <div style={{textAlign: 'center'}}>
+                    <img src="/images/img.png" alt="Upload" width={64} height={64} style={{display: 'block', margin: '0 auto 16px'}} />
+                    <p className={styles.uploadText}>
+                      Drag and drop your image here, or click to select
+                    </p>
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: 'none' }}
+                />
               </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={{ display: 'none' }}
-            />
+              <textarea
+                className={styles.caption}
+                placeholder="Write a caption..."
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+              {error && <div className={styles.error}>{error}</div>}
+              <button
+                className={styles.shareButton}
+                type="submit"
+                disabled={!image || isSubmitting}
+              >
+                {isSubmitting ? 'Sharing...' : 'Share Post'}
+              </button>
+            </form>
           </div>
-          <textarea
-            className={styles.caption}
-            placeholder="Write a caption..."
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-          />
-          {error && <div className={styles.error}>{error}</div>}
-          <button
-            className={styles.shareButton}
-            type="submit"
-            disabled={!image || isSubmitting}
-          >
-            {isSubmitting ? 'Sharing...' : 'Share Post'}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

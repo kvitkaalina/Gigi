@@ -623,4 +623,87 @@
   padding: 0;
   line-height: 1;
   text-align: right;
+}
+
+/* Мобильные стили */
+@media (max-width: 768px) {
+  .chat {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .header {
+    width: 100%;
+    padding: 10px 8px;
+    box-sizing: border-box;
+  }
+  .userInfo {
+    gap: 10px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+  .messages {
+    padding: 10px 6px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .message {
+    max-width: 90%;
+    font-size: 15px;
+  }
+  .bubble {
+    padding: 10px 18px 18px 10px;
+    font-size: 15px;
+  }
+  .bubble p {
+    font-size: 15px;
+  }
+  .bubble time {
+    font-size: 12px;
+    right: 10px;
+    bottom: 4px;
+  }
+  .footer {
+    width: 100%;
+    padding: 8px 6px;
+    box-sizing: border-box;
+  }
+  .input {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+  .imageButton, .sendButton {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .bubble {
+    padding: 8px 14px 14px 8px;
+    font-size: 14px;
+  }
+  .bubble p {
+    font-size: 14px;
+  }
+  .bubble time {
+    font-size: 11px;
+  }
+  .input {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+  .imageButton, .sendButton {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
 } 

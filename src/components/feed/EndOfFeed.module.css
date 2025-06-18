@@ -71,4 +71,45 @@
 .copyright {
   color: #8e8e8e;
   font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .navigation, .copyright {
+    display: none !important;
+  }
+  
+  .endOfFeed {
+    padding: 32px 16px;
+    margin: 16px 0;
+  }
+  
+  .title {
+    font-size: 14px;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+    margin: 0 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .endOfFeed {
+    padding: 24px 12px;
+    margin: 12px 0;
+  }
+  
+  .checkmarkContainer {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+  }
+  
+  .title {
+    font-size: 13px;
+  }
+  
+  .subtitle {
+    font-size: 11px;
+  }
 } 

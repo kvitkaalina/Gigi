@@ -58,4 +58,31 @@
   .postsInfoWrapper {
     display: none;
   }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+  
+  .sidebarWrapper {
+    display: none;
+  }
+  
+  .mainContent {
+    flex-direction: column;
+    padding: 16px 12px;
+    padding-bottom: 80px; /* Место для мобильной навигации */
+  }
+  
+  .postsInfoWrapper {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px 8px;
+    padding-bottom: 80px;
+  }
 } 

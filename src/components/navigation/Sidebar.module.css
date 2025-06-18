@@ -96,38 +96,45 @@
   box-shadow: none;
 }
 
+/* Скрываем подписи только на мобильных */
+@media (max-width: 768px) {
+  .label {
+    display: none;
+  }
+  .sidebar {
+    display: none !important;
+  }
+}
+
+/* Удаляю или комментирую старый медиа-запрос для .label (max-width: 1264px) */
+/*
 @media (max-width: 1264px) {
   .label {
     display: none;
   }
-  
   .sidebar {
     width: 72px;
     align-items: center;
   }
-  
   .logo {
     display: none;
   }
-  
   .navItem {
     padding: 12px;
     justify-content: center;
   }
-  
   .icon {
     margin-right: 0;
   }
-  
   .navItem.logoutButton {
     padding: 12px;
     justify-content: center;
   }
-  
   .navItem.logoutButton .icon {
     margin: 0;
   }
 }
+*/
 
 .searchModal {
   position: fixed;

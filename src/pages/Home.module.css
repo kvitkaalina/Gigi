@@ -43,6 +43,85 @@
   }
 }
 
+/* Мобильные стили */
+@media (max-width: 768px) {
+  .homeContainer {
+    flex-direction: column;
+  }
+  
+  .content {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 16px 12px;
+    padding-bottom: 80px; /* Место для мобильной навигации */
+  }
+  
+  .posts {
+    max-width: 100%;
+  }
+  
+  .main {
+    padding: 16px 12px;
+    padding-bottom: 80px;
+  }
+  
+  .post {
+    margin-bottom: 16px;
+  }
+  
+  .postHeader {
+    padding: 12px;
+  }
+  
+  .postActions {
+    padding: 6px;
+  }
+  
+  .actionButton {
+    padding: 6px;
+    font-size: 20px;
+  }
+  
+  .comments {
+    padding: 8px;
+  }
+  
+  .comment {
+    padding: 8px;
+  }
+  
+  .commentInput {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+  .content {
+    padding: 12px 8px;
+    padding-bottom: 80px;
+  }
+  
+  .main {
+    padding: 12px 8px;
+    padding-bottom: 80px;
+  }
+  
+  .postHeader {
+    padding: 10px;
+  }
+  
+  .avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .username {
+    font-size: 14px;
+  }
+}
+
 .home {
   background-color: #fafafa;
   min-height: 100vh;

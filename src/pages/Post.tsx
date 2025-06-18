@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { postService } from '../services';
 import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import PostsInfo from '../components/feed/PostsInfo';
 import styles from './Post.module.css';
 import type { Post as PostType } from '../services/postService';
 import { usePostModalContext } from '../components/post/PostModalProvider';
+import PostModal from '../components/post/PostModal';
 
 const Post: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +48,7 @@ const Post: React.FC = () => {
       <div className={styles.sidebarWrapper}>
         <Sidebar />
       </div>
+      <MobileNav />
       <div className={styles.mainContent}>
         <div className={styles.postsInfoWrapper}>
           <PostsInfo />

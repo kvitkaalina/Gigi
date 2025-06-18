@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Explore.module.css';
 import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import PostsInfo from '../components/feed/PostsInfo';
 import { searchService } from '../services';
 import type { Post } from '../services/postService';
@@ -50,6 +51,7 @@ const Explore: React.FC = () => {
   return (
     <div className={styles.exploreContainer}>
       <Sidebar />
+      <MobileNav />
       <div className={styles.explorePage}>
         <div className={styles.header}>
           <h1 className={styles.title}>Explore</h1>

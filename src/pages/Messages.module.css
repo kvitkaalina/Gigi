@@ -119,26 +119,79 @@
 
 /* Mobile styles */
 @media (max-width: 768px) {
-  .chatList {
-    width: 300px;
-    min-width: 300px;
+  .container {
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    padding-bottom: 60px; /* Место для мобильной навигации */
+    box-sizing: border-box;
   }
-
+  .content {
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .chatList {
+    width: 100%;
+    min-width: 100%;
+    height: 45vh;
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+    box-sizing: border-box;
+    padding-bottom: 60px; /* Не перекрывать навигацией */
+  }
+  .chatArea {
+    width: 100%;
+    min-width: 0;
+    height: 55vh;
+    min-height: 55vh;
+    box-sizing: border-box;
+    padding-bottom: 60px;
+  }
+  .noChatSelected {
+    padding: 20px;
+  }
   .noChatContent {
     padding: 24px;
+    max-width: 100%;
   }
-
   .welcomeImage {
     width: 80px;
     height: 80px;
     margin-bottom: 16px;
   }
-
   .noChatContent h3 {
     font-size: 20px;
   }
-
   .noChatContent p {
     font-size: 14px;
+  }
+  .copyright {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatList {
+    height: 40vh;
+    padding-bottom: 60px;
+  }
+  .chatArea {
+    height: 60vh;
+    padding-bottom: 60px;
+  }
+  .noChatContent {
+    padding: 16px;
+  }
+  .welcomeImage {
+    width: 60px;
+    height: 60px;
+  }
+  .noChatContent h3 {
+    font-size: 18px;
+  }
+  .noChatContent p {
+    font-size: 13px;
   }
 } 

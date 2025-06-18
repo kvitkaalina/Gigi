@@ -311,7 +311,10 @@
 
 @media (max-width: 768px) {
   .explorePage {
+    margin-left: 0;
+    max-width: 100%;
     padding: 20px 15px;
+    padding-bottom: 80px;
   }
 
   .title {
@@ -333,11 +336,36 @@
 }
 
 @media (max-width: 480px) {
+  .explorePage {
+    padding: 15px 10px;
+    padding-bottom: 80px;
+  }
+  
   .grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(12, 1fr);
-    height: calc((100vw - 20px - 12px) * 12);
     gap: 12px;
+    padding: 0 4px;
+    height: auto;
+  }
+  
+  .gridItem {
+    margin: 0;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    height: auto;
+    min-height: unset;
+    max-height: unset;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .postImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    object-fit: cover;
   }
 
   .postInfo {
@@ -347,9 +375,5 @@
   .authorAvatar {
     width: 24px;
     height: 24px;
-  }
-
-  .explorePage {
-    padding: 15px 10px;
   }
 } 

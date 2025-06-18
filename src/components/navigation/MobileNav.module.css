@@ -1,0 +1,72 @@
+.mobileNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #dbdbdb;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  min-width: 60px;
+  color: #8e8e8e;
+}
+
+.navItem:hover {
+  background-color: #f8f8f8;
+  color: #3a5e63;
+}
+
+.navItem.active {
+  color: #3a5e63;
+}
+
+.navItem i {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.navItem span {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Скрываем на десктопе */
+@media (min-width: 769px) {
+  .mobileNav {
+    display: none;
+  }
+}
+
+/* Улучшения для очень маленьких экранов */
+@media (max-width: 360px) {
+  .navItem {
+    padding: 6px 8px;
+    min-width: 50px;
+  }
+  
+  .navItem i {
+    font-size: 18px;
+  }
+  
+  .navItem span {
+    font-size: 9px;
+  }
+} 

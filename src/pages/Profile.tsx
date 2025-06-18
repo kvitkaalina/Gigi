@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import DeletePostModal from '../components/profile/DeletePostModal';
 import FollowList from '../components/profile/FollowList';
@@ -254,6 +255,7 @@ const Profile: React.FC = () => {
   return (
     <div className={styles.profilePage}>
       <Sidebar />
+      <MobileNav />
       <main className={styles.main}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>

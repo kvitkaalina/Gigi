@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../components/navigation/Sidebar';
+import MobileNav from '../components/navigation/MobileNav';
 import { ChatList } from '../components/chat/ChatList';
 import { Chat } from '../components/chat/Chat';
 import chatApi from '../api/chatApi';
@@ -144,6 +145,7 @@ const Messages: React.FC = () => {
   return (
     <div className={styles.container}>
       <Sidebar />
+      <MobileNav />
       <div className={styles.content}>
         <div className={styles.chatList}>
           <ChatList

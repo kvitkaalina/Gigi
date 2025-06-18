@@ -1,17 +1,22 @@
 .createPost {
-  background-color: #fafafa;
+  display: flex;
   min-height: 100vh;
+  background-color: #fafafa;
 }
 
 .main {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 84px 20px 20px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  max-width: calc(100% - 200px);
 }
 
 .container {
-  max-width: 800px;
-  margin: 40px auto;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
   padding: 0 20px;
 }
 
@@ -190,7 +195,25 @@
   box-shadow: none;
 }
 
+@media (max-width: 1264px) {
+  .main {
+    margin-left: 72px;
+    max-width: calc(100% - 72px);
+  }
+}
+
 @media (max-width: 768px) {
+  .createPost {
+    flex-direction: column;
+  }
+  
+  .main {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 16px 12px;
+    padding-bottom: 80px; /* Место для мобильной навигации */
+  }
+  
   .container {
     margin: 20px auto;
   }
@@ -209,6 +232,44 @@
   }
 
   .uploadText {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 12px 8px;
+    padding-bottom: 80px;
+  }
+  
+  .container {
+    padding: 0 12px;
+  }
+  
+  .createPostCard {
+    padding: 16px;
+  }
+  
+  .uploadArea {
+    padding: 16px;
+    min-height: 150px;
+  }
+  
+  .uploadIcon {
+    font-size: 28px;
+  }
+  
+  .uploadText {
+    font-size: 12px;
+  }
+  
+  .caption {
+    font-size: 14px;
+    min-height: 80px;
+  }
+  
+  .shareButton {
+    padding: 12px;
     font-size: 14px;
   }
 } 

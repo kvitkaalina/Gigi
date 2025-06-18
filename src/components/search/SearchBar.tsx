@@ -99,6 +99,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onUserSelect }) => {
                   src={user.avatar ? getAssetUrl(user.avatar) : defaultAvatar}
                   alt={user.username}
                   className={styles.userAvatar}
+                  onError={e => {
+                    e.currentTarget.src = defaultAvatar;
+                  }}
                 />
                 <div className={styles.userInfo}>
                   <div className={styles.userName}>{user.username}</div>

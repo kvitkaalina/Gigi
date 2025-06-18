@@ -5,6 +5,13 @@
     position: relative;
 }
 
+.adminContent {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
 .userList {
     margin-top: 20px;
     overflow-x: auto;
@@ -198,4 +205,99 @@ button:disabled, .block:disabled, .unblock:disabled, .delete:disabled, .usersBut
 
 .delete:hover {
     background: linear-gradient(45deg, #b92d39, #a71d2a);
+}
+
+/* Мобильные стили */
+@media (max-width: 768px) {
+  .adminPanel {
+    padding: 0;
+  }
+  
+  .adminContent {
+    padding: 16px 12px;
+    padding-bottom: 80px; /* Место для мобильной навигации */
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .title {
+    font-size: 18px;
+  }
+  
+  .usersButton {
+    align-self: stretch;
+    justify-content: center;
+  }
+  
+  .backButton {
+    position: static;
+    align-self: stretch;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  
+  .userList {
+    margin-top: 16px;
+    overflow-x: auto;
+  }
+  
+  .userList table {
+    font-size: 12px;
+  }
+  
+  .userList th,
+  .userList td {
+    padding: 8px 6px;
+  }
+  
+  .block, .unblock, .delete {
+    padding: 4px 8px;
+    font-size: 11px;
+    margin-right: 4px;
+  }
+  
+  .blocked, .active {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminContent {
+    padding: 12px 8px;
+    padding-bottom: 80px;
+  }
+  
+  .title {
+    font-size: 16px;
+  }
+  
+  .userList table {
+    font-size: 11px;
+  }
+  
+  .userList th,
+  .userList td {
+    padding: 6px 4px;
+  }
+  
+  .block, .unblock, .delete {
+    padding: 3px 6px;
+    font-size: 10px;
+    margin-right: 2px;
+  }
+  
+  .blocked, .active {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+  
+  .usersButton, .backButton {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
 } 

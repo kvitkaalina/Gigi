@@ -84,13 +84,32 @@ const Messages: React.FC = () => {
 
   const handleNewSocketMessage = (message: IMessage) => {
     const isUpdate = messages.some(m => m._id === message._id);
-    
     setMessages(prev => {
       if (isUpdate) {
         return prev.map(m => m._id === message._id ? message : m);
       }
       if (prev.some(m => m._id === message._id)) return prev;
       return [...prev, message];
+    });
+    // Обновляем превью и порядок чатов только для чата с собеседником
+    const myUserId = localStorage.getItem('userId');
+    const companionId = message.sender._id === myUserId ? message.receiver._id : message.sender._id;
+    setChats(prevChats => {
+      const updatedChats = prevChats.map(chat => {
+        if (chat.user._id === companionId) {
+          return {
+            ...chat,
+            lastMessage: message,
+            unreadCount: message.sender._id === myUserId ? 0 : chat.unreadCount
+          };
+        }
+        return chat;
+      });
+      return updatedChats.sort((a, b) => {
+        const aTime = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
+        const bTime = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
     });
   };
 

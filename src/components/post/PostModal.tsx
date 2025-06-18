@@ -152,7 +152,6 @@ const PostModal: React.FC<PostModalProps> = ({
   const handleCommentClick = (username: string, e: React.MouseEvent) => {
     e.stopPropagation();
     navigate(`/profile/${username}`);
-    onClose();
   };
 
   const handleModalClose = (e: React.MouseEvent) => {

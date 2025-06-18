@@ -62,16 +62,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
       {isSearching ? (
         <div className={styles.searchContainer}>
           <div className={styles.searchHeader}>
-            <button
-              className={styles.backButton}
-              onClick={() => {
-                setIsSearching(false);
-                setSearchQuery('');
-                setSearchResults([]);
-              }}
-            >
-              Back
-            </button>
+            {/* Кнопка Back удалена */}
           </div>
           <div className={styles.searchInputContainer}>
             <input

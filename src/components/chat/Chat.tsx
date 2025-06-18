@@ -7,6 +7,7 @@ import { STATIC_URL } from '../../config';
 import styles from './Chat.module.css';
 import { useNavigate } from 'react-router-dom';
 import Picker from '@emoji-mart/react';
+import chatService from '../../services/chatService';
 
 interface ChatProps {
   chat: IChat;
@@ -32,10 +33,32 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const editInputRef = useRef<HTMLTextAreaElement>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  
+  const isUserAtBottom = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    setShouldAutoScroll(isUserAtBottom());
+  }, [isUserAtBottom]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
   
   const { startTyping, stopTyping } = useSocket({
     onNewMessage: (message: IMessage) => {
-      onNewSocketMessage(message);
+      if (message.sender._id === chat.user._id || message.receiver._id === chat.user._id) {
+        console.log('New message in current chat:', message);
+        onNewSocketMessage(message);
+      }
     },
     onUserTyping: (userId: string) => {
       if (chat.user._id === userId) {
@@ -71,40 +94,22 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     return timeStr;
   };
 
-  function isUserAtBottom(): boolean {
-    const container = messagesContainerRef.current;
-    if (!container) return true;
-    return container.scrollHeight - container.scrollTop - container.clientHeight < 50;
-  }
-
-  useEffect(() => {
-    if (isUserAtBottom()) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 0);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        const chatMessages = await chatApi.getMessages(chat.user._id);
-        await chatApi.markAsRead(chat.user._id);
-      } catch (error) {
-        console.error('Error loading messages:', error);
-        setError('Failed to load messages');
-      }
-    };
-
-    loadMessages();
-  }, [chat.user._id]);
-
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
     try {
-      onSendMessage(newMessage.trim(), 'text');
+      const message = await chatService.sendMessage(chat.user._id, newMessage.trim(), 'text');
       setNewMessage('');
+      onNewSocketMessage(message);
+      const container = messagesContainerRef.current;
+      if (container) {
+        const scrollHeight = container.scrollHeight;
+        requestAnimationFrame(() => {
+          if (container) {
+            container.scrollTop = scrollHeight;
+          }
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');
@@ -116,12 +121,84 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     if (!file) return;
 
     try {
-      onSendMessage('', 'image', file);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'image');
+      
+      const response = await fetch(`${STATIC_URL}/api/messages/${chat.user._id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const message = await response.json();
+      onNewSocketMessage(message);
+      const container = messagesContainerRef.current;
+      if (container) {
+        const scrollHeight = container.scrollHeight;
+        requestAnimationFrame(() => {
+          if (container) {
+            container.scrollTop = scrollHeight;
+          }
+        });
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       setError('Failed to upload image');
     }
   };
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const chatMessages = await chatApi.getMessages(chat.user._id);
+        await chatApi.markAsRead(chat.user._id);
+        if (chatMessages.length > 0) {
+          chatMessages.forEach(message => {
+            onNewSocketMessage(message);
+          });
+          requestAnimationFrame(() => {
+            const container = messagesContainerRef.current;
+            if (container) {
+              container.scrollTop = container.scrollHeight;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        setError('Failed to load messages');
+      }
+    };
+
+    loadMessages();
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      chatService.connect(token);
+    }
+
+    return () => {
+      chatService.onNewMessage(() => {});
+      chatService.onUserTyping(() => {});
+      chatService.onUserStopTyping(() => {});
+      chatService.onUserStatusChanged(() => {});
+    };
+  }, [chat.user._id]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    });
+  }, [chat._id]);
 
   const handleViewProfile = () => {
     navigate(`/profile/${chat.user.username}`);
@@ -144,24 +221,19 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     if (!editingValue.trim()) return;
     
     try {
-      // Сначала отправляем изменения на сервер
       await chatApi.editMessage(messageId, editingValue);
       
-      // Находим сообщение для обновления
       const messageToUpdate = messages.find(m => m._id === messageId);
       if (messageToUpdate) {
-        // Создаем обновленное сообщение
         const updatedMessage = {
           ...messageToUpdate,
           content: editingValue,
-          updatedAt: new Date().toISOString() // Добавляем время обновления
+          updatedAt: new Date().toISOString()
         };
         
-        // Отправляем обновленное сообщение через socket для синхронизации
         onNewSocketMessage(updatedMessage);
       }
       
-      // Сбрасываем состояние редактирования
       setEditingId(null);
       setEditingValue('');
     } catch (error) {
@@ -193,7 +265,9 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const renderMessage = (message: IMessage) => {
     const isOwn = message.sender._id === currentUserId;
     const isImage = message.type === 'image';
+    const isRepost = message.type === 'repost';
     const isEditing = editingId === message._id;
+
     return (
       <div
         key={message._id}
@@ -210,9 +284,43 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
             />
             <time>{formatMessageTime(message)}</time>
             {isOwn && (
-              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">✖</button>
+              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18" />
+                  <path d="M6 6l12 12" />
+                </svg>
+              </button>
             )}
           </>
+        ) : isRepost ? (
+          <div className={styles.repostBubble}>
+            <span className={styles.repostLabel}>
+              <i className="fas fa-paper-plane" style={{ fontSize: 13, color: '#b0b0b0', opacity: 0.7 }}></i>
+            </span>
+            {isOwn && (
+              <button className={styles.repostDeleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete repost">
+                <i className="fas fa-times"></i>
+              </button>
+            )}
+            <div className={styles.repostImageWrapper}>
+              <img 
+                src={message.postId?.image ? `${STATIC_URL}${message.postId.image}` : '/images/my-avatar-placeholder.png'} 
+                alt="Reposted post" 
+                className={styles.repostImage}
+                onClick={() => navigate(`/post/${message.postId?._id}`)}
+              />
+            </div>
+            <div className={styles.repostMeta}>
+              <span className={styles.repostAuthor}>{message.postId?.author?.username}</span>
+              {message.postId?.description && (
+                <span className={styles.repostDescription}>{message.postId.description}</span>
+              )}
+            </div>
+            {message.comment && (
+              <div className={styles.repostCommentBubble}>{message.comment}</div>
+            )}
+            <span className={styles.repostTime}>{formatMessageTime(message)}</span>
+          </div>
         ) : (
           <div className={`${styles.bubble} ${isEditing ? styles.editing : ''}`}>
             {isEditing ? (
@@ -279,11 +387,18 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
         <div className={styles.userInfo}>
           <div className={styles.avatarContainer}>
             <img
-              src={chat.user.avatar.startsWith('http') ? chat.user.avatar : `${STATIC_URL}${chat.user.avatar}`}
+              src={
+                typeof chat.user.avatar === 'string'
+                  ? (chat.user.avatar.startsWith('http')
+                      ? chat.user.avatar
+                      : `${STATIC_URL}${chat.user.avatar}`)
+                  : '/images/my-avatar-placeholder.png'
+              }
               alt={chat.user.username}
               className={styles.avatar}
-              onError={(e) => {
+              onError={e => {
                 const target = e.target as HTMLImageElement;
+                target.onerror = null;
                 target.src = '/images/my-avatar-placeholder.png';
               }}
             />
@@ -305,7 +420,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
       </header>
 
       <div className={styles.messages} ref={messagesContainerRef}>
-        {messages.map(renderMessage)}
+        {messages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map(renderMessage)}
         {isTyping && (
           <div className={styles.typing}>
             <div className={styles.dot}></div>
@@ -365,8 +480,9 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <path d="M21 15l-5-5L5 21" />
           </svg>
         </button>
         <button

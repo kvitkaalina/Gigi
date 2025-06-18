@@ -5,6 +5,8 @@ import { likeService, postService, commentService } from '../../services';
 import type { Post, Comment } from '../../services/postService';
 import { API_BASE_URL } from '../../services/config';
 import Picker from '@emoji-mart/react';
+import RepostModal from './RepostModal';
+import chatApi from '../../api/chatApi';
 
 interface PostModalProps {
   post: Post;
@@ -29,6 +31,7 @@ const PostModal: React.FC<PostModalProps> = ({
   const [comments, setComments] = useState<Comment[]>(post?.comments || []);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRepostModal, setShowRepostModal] = useState(false);
   const userId = localStorage.getItem('userId');
   
   const commentsSectionRef = useRef<HTMLDivElement>(null);
@@ -197,6 +200,17 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
+  const handleRepost = async (chatId: string, comment: string) => {
+    try {
+      await chatApi.sendMessage(chatId, '', 'repost', undefined, {
+        postId: post._id,
+        comment
+      });
+    } catch (error) {
+      console.error('Error reposting:', error);
+    }
+  };
+
   return (
     <div 
       className={`${styles.overlay} ${isStandalone ? styles.standalone : ''}`}
@@ -265,25 +279,27 @@ const PostModal: React.FC<PostModalProps> = ({
                     className={styles.commentAvatar}
                   />
                   <div className={styles.commentText}>
-                    <span className={styles.commentUsername}>
-                      {comment.user?.username}
-                    </span>
+                    <div className={styles.commentHeaderRow}>
+                      <span className={styles.commentUsername}>
+                        {comment.user?.username}
+                      </span>
+                      {comment.user?._id === userId && (
+                        <button
+                          className={styles.deleteComment}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteComment(comment._id);
+                          }}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      )}
+                    </div>
                     <span className={styles.commentBody}>{comment.text}</span>
                     <span className={styles.commentTime}>
                       {new Date(comment.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  {comment.user?._id === userId && (
-                    <button
-                      className={styles.deleteComment}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteComment(comment._id);
-                      }}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  )}
                 </div>
               </div>
             ))}
@@ -296,9 +312,15 @@ const PostModal: React.FC<PostModalProps> = ({
             >
               <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
             </button>
-            <span className={styles.likesCount}>
-              {likesCount} likes
-            </span>
+            <button
+              className={styles.actionButton}
+              onClick={() => setShowRepostModal(true)}
+            >
+              <i className="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div className={styles.likesCountBlock}>
+            <span className={styles.likesCount}>{likesCount} likes</span>
           </div>
 
           <form className={styles.commentForm} onSubmit={handleComment} style={{ position: 'relative' }}>
@@ -345,6 +367,14 @@ const PostModal: React.FC<PostModalProps> = ({
           </form>
         </div>
       </div>
+
+      {showRepostModal && (
+        <RepostModal
+          postId={post._id}
+          onClose={() => setShowRepostModal(false)}
+          onRepost={handleRepost}
+        />
+      )}
     </div>
   );
 };

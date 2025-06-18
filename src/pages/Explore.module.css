@@ -7,7 +7,7 @@
 .explorePage {
   flex: 1;
   padding: 20px 40px;
-  max-width: calc(100% - 245px);
+  max-width: calc(100% - 200px);
 }
 
 .header {

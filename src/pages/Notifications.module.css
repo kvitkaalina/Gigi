@@ -1,6 +1,6 @@
 .layout {
   display: grid;
-  grid-template-columns: 244px 1fr;
+  grid-template-columns: 200px 1fr;
   min-height: 100vh;
   background-color: #fafafa;
 }
@@ -9,7 +9,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 244px;
+  width: 200px;
   height: 100vh;
   border-right: 1px solid #dbdbdb;
   background-color: white;

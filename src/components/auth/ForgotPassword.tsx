@@ -29,7 +29,7 @@ const ForgotPassword: React.FC = () => {
 
     try {
       await api.post('/auth/forgot-password', { email });
-      alert('Password reset link has been sent to your email');
+      // alert('Password reset link has been sent to your email');
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'An error occurred');

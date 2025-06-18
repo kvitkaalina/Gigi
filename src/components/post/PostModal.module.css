@@ -62,8 +62,8 @@
 }
 
 .contentSection {
-  width: 400px;
-  min-width: 400px;
+  width: 440px;
+  min-width: 440px;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #dbdbdb;
@@ -175,6 +175,9 @@
 
 .commentText {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .commentUsername {
@@ -197,19 +200,24 @@
   margin-top: 4px;
 }
 
+.commentHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .deleteComment {
   background: none;
   border: none;
   color: #8e8e8e;
   cursor: pointer;
-  padding: 4px;
+  padding: 2px 4px;
   opacity: 0;
-  transition: opacity 0.2s ease;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  font-size: 15px;
+  align-self: center;
+  position: static;
 }
 
 .comment:hover .deleteComment {
@@ -232,7 +240,7 @@
   background: none;
   border: none;
   font-size: 24px;
-  color: #262626;
+  color:#3a5e63  ;
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -286,10 +294,16 @@
   }
 }
 
+.likesCountBlock {
+  padding: 0 16px 8px 16px;
+  text-align: left;
+}
+
 .likesCount {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: #262626;
+  display: inline-block;
 }
 
 .likesCount.updating {
@@ -311,7 +325,7 @@
 
 .commentForm {
   display: flex;
-  padding: 16px;
+  padding: 12px;
   border-top: 1px solid #dbdbdb;
   gap: 12px;
 }
@@ -321,8 +335,11 @@
   border: none;
   outline: none;
   font-size: 14px;
-  padding: 8px 0;
+  padding: 8px 12px;
+  min-height: 36px;
   resize: none;
+  background: #fafafa;
+  border-radius: 4px;
 }
 
 .commentInput::placeholder {

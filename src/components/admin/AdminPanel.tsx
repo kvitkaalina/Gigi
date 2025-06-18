@@ -43,14 +43,12 @@ const AdminPanel: React.FC = () => {
 
     // Удаление пользователя
     const handleDeleteUser = async (userId: string) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            try {
-                await adminService.deleteUser(userId);
-                // Обновляем список пользователей
-                loadUsers();
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Error deleting user');
-            }
+        try {
+            await adminService.deleteUser(userId);
+            // Обновляем список пользователей
+            loadUsers();
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Error deleting user');
         }
     };
 

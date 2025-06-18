@@ -7,7 +7,7 @@
 .content {
   flex: 1;
   padding: 24px;
-  max-width: calc(100% - 245px);
+  max-width: calc(100% - 200px);
 }
 
 .posts {
@@ -47,7 +47,7 @@
   background-color: #fafafa;
   min-height: 100vh;
   display: flex;
-  padding-left: 245px;
+  padding-left: 200px;
 }
 
 .main {
@@ -718,4 +718,9 @@
 .commentBody {
   color: #262626;
   word-break: break-word;
+}
+
+.actionButton .fa-paper-plane,
+.actionButton .fas.fa-paper-plane {
+  color: #3a5e63 !important;
 }

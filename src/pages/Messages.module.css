@@ -12,8 +12,8 @@
 }
 
 .chatList {
-  width: 360px;
-  min-width: 360px;
+  width: 340px;
+  min-width: 340px;
   flex-shrink: 0;
   border-right: 1px solid #e5e5e5;
   background: #ffffff;
@@ -120,8 +120,8 @@
 /* Mobile styles */
 @media (max-width: 768px) {
   .chatList {
-    width: 320px;
-    min-width: 320px;
+    width: 300px;
+    min-width: 300px;
   }
 
   .noChatContent {

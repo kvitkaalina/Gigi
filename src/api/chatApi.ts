@@ -49,19 +49,26 @@ const chatApi = {
   },
 
   // Отправка сообщения
-  sendMessage: async (userId: string, content: string, type: 'text' | 'image' = 'text', file?: File): Promise<IMessage> => {
+  sendMessage: async (userId: string, content: string, type: 'text' | 'image' | 'repost' = 'text', file?: File, repostData?: { postId: string, comment?: string }): Promise<IMessage> => {
     try {
       let data: any;
       let config: any = {};
+      
       if (type === 'image' && file) {
         data = new FormData();
         data.append('type', 'image');
         data.append('file', file);
         config.headers = { 'Content-Type': 'multipart/form-data' };
+      } else if (type === 'repost' && repostData) {
+        data = {
+          type: 'repost',
+          postId: repostData.postId,
+          comment: repostData.comment
+        };
       } else {
         data = { content, type: 'text' };
-        // Не передаём headers, чтобы axios сам поставил application/json
       }
+      
       const response = await api.post<IMessage>(`/messages/${userId}`, data, config);
       return response.data;
     } catch (error) {

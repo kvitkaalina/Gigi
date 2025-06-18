@@ -41,7 +41,6 @@ const ResetPassword: React.FC = () => {
         navigate(`/profile/${response.data.username}`);
       } else {
         // Если токен не получен, перенаправляем на страницу входа
-        alert('Password reset successful. Please log in.');
         navigate('/login');
       }
     } catch (err: any) {

@@ -36,7 +36,7 @@
   padding: 8px;
   cursor: pointer;
   font-size: 16px;
-  color: #46756d;
+  color: #acacac;
   transition: all 0.3s ease;
   order: 2;
 }
@@ -94,6 +94,10 @@
   cursor: pointer;
   position: relative;
   min-height: 300px;
+  max-width: 400px;
+  max-height: 400px;
+  width: 100%;
+  margin: 0 auto 24px auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,13 +109,19 @@
 }
 
 .uploadIcon {
-  font-size: 48px;
-  color: #46756d;
+  font-size: 80px;
   margin-bottom: 16px;
+  max-width: 100px;
+  max-height: 100px;
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .uploadText {
-  color: #46756d;
+  color:  #acacac;
   font-size: 16px;
   margin: 0;
 }
@@ -140,6 +150,11 @@
   outline: none;
   border-color: #46756d;
   box-shadow: 0 0 0 4px rgba(70, 117, 109, 0.1);
+}
+
+.caption::placeholder {
+  color: #acacac;
+  opacity: 1;
 }
 
 .error {

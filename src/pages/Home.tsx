@@ -9,6 +9,8 @@ import { API_BASE_URL, getAuthHeaders } from '../services/config';
 import type { Post, Comment } from '../services/postService';
 import { commentService } from '../services/commentService';
 import Picker from '@emoji-mart/react';
+import RepostModal from '../components/post/RepostModal';
+import { chatService } from '../services/chatService';
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -33,6 +35,7 @@ const Home: React.FC = () => {
   const [emojiPickerCoords, setEmojiPickerCoords] = useState<{[postId: string]: {left: number, top: number} | null}>({});
   const emojiButtonRefs = useRef<{[postId: string]: HTMLButtonElement | null}>({});
   const pickerHeight = 370; // Примерная высота emoji-пикера
+  const [showRepostModalForPostId, setShowRepostModalForPostId] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async (pageNum: number = 1, isPreload: boolean = false) => {
     try {
@@ -188,6 +191,13 @@ const Home: React.FC = () => {
     });
   }, [loading, hasMore, posts.length]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      chatService.connect(token);
+    }
+  }, []);
+
   const handleLike = async (postId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/likes/${postId}`, {
@@ -268,7 +278,7 @@ const Home: React.FC = () => {
       console.log('Comment successfully added');
     } catch (error) {
       console.error('Error adding comment:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add comment. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to add comment. Please try again.');
     }
   };
 
@@ -298,7 +308,7 @@ const Home: React.FC = () => {
       console.log('Comment successfully deleted');
     } catch (error) {
       console.error('Error deleting comment:', error);
-      alert(error instanceof Error ? error.message : 'Failed to delete comment. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to delete comment. Please try again.');
     }
   };
 
@@ -321,13 +331,12 @@ const Home: React.FC = () => {
   };
 
   const handleEmojiSelect = (postId: string, emoji: any) => {
-    const input = inputRefs.current[postId];
-    if (!input) return;
+    if (!inputRefs.current[postId]) return;
+    const input = inputRefs.current[postId]!;
     const start = input.selectionStart || 0;
     const end = input.selectionEnd || 0;
     const emojiChar = emoji.native || '';
-    const value = newComments[postId] || '';
-    const newValue = value.slice(0, start) + emojiChar + value.slice(end);
+    const newValue = (newComments[postId] || '').slice(0, start) + emojiChar + (newComments[postId] || '').slice(end);
     setNewComments(prev => ({ ...prev, [postId]: newValue }));
     setShowEmojiPicker(prev => ({ ...prev, [postId]: false }));
     setTimeout(() => {
@@ -358,6 +367,28 @@ const Home: React.FC = () => {
     }
   };
 
+  const handleOpenRepostModal = (post: Post) => {
+    setShowRepostModalForPostId(post._id);
+  };
+
+  const handleRepost = async (chatId: string, comment: string) => {
+    try {
+      const postId = showRepostModalForPostId;
+      if (!postId) return;
+      await chatService.sendMessage(
+        chatId,
+        '', // content пустой для репоста
+        'repost',
+        postId,
+        comment
+      );
+      // Можно добавить уведомление или обновить UI
+    } catch (error) {
+      console.error('Ошибка при отправке репоста:', error);
+      alert('Не удалось отправить репост');
+    }
+  };
+
   const renderComment = (post: Post, comment: Comment) => {
     const userId = localStorage.getItem('userId');
     if (!comment || !comment.user) return null;
@@ -385,11 +416,7 @@ const Home: React.FC = () => {
               {comment.user?._id === userId && (
                 <button
                   className={styles.deleteComment}
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this comment?')) {
-                      handleDeleteComment(post._id, comment._id);
-                    }
-                  }}
+                  onClick={() => handleDeleteComment(post._id, comment._id)}
                 >
                   <i className="fas fa-trash"></i>
                 </button>
@@ -475,6 +502,13 @@ const Home: React.FC = () => {
               <span className={styles.commentCount}>{comments.length}</span>
             )}
           </button>
+          <button
+            className={styles.actionButton}
+            onClick={() => handleOpenRepostModal(post)}
+            title="Share"
+          >
+            <i className="fas fa-paper-plane" style={{ color: '#3a5e63' }}></i>
+          </button>
         </div>
         <div className={`${styles.likes} ${updatingLikes === post._id ? styles.updating : ''}`}>
           {post.likesCount || post.likes?.length || 0} likes
@@ -556,6 +590,13 @@ const Home: React.FC = () => {
             </button>
           </div>
         </div>
+        {showRepostModalForPostId === post._id && (
+          <RepostModal
+            postId={post._id}
+            onClose={() => setShowRepostModalForPostId(null)}
+            onRepost={handleRepost}
+          />
+        )}
       </div>
     );
   };

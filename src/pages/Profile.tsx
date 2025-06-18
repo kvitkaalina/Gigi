@@ -116,15 +116,13 @@ const Profile: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Проверка размера файла (5MB максимум)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size should be less than 5MB');
+      setError('File size should be less than 5MB');
       return;
     }
 
-    // Проверка типа файла
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      setError('Please upload an image file');
       return;
     }
 

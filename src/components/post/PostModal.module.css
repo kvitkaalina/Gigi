@@ -105,7 +105,7 @@
 .closeButton {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   color: #262626;
   cursor: pointer;
   padding: 8px;
@@ -114,11 +114,14 @@
   justify-content: center;
   position: relative;
   z-index: 2;
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
 }
 
 .closeButton:hover {
-  opacity: 0.7;
+  color: #bf424c;
 }
 
 .closeButton:active {
@@ -133,6 +136,14 @@
 .closeButton:focus-visible {
   outline: 2px solid #0095f6;
   outline-offset: 2px;
+}
+
+.closeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+  transform: none;
 }
 
 .description {
@@ -245,6 +256,8 @@
   padding: 0;
   display: flex;
   align-items: center;
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.1s;
 }
 
 .actionButton.liked {
@@ -366,15 +379,27 @@
   color: #3a5e63;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 4px;
-  margin-right: 8px;
-  font-weight: 500;
+  padding: 0;
 }
 
 .postCommentButton:disabled {
   color: #b3dbf6;
   cursor: default;
+}
+
+.postCommentButton:focus-visible {
+  outline: 2px solid #3a5e63;
+  outline-offset: 2px;
+}
+
+.postCommentButton:disabled, .closeButton:disabled, .actionButton:disabled {
+  color: #cccccc !important;
+  background: #f5f5f5 !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+  transform: none;
 }
 
 @media screen and (max-width: 1200px) {

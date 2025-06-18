@@ -36,18 +36,25 @@
 .closeButton {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   color: #8e8e8e;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px;
+  border-radius: 8px;
+  transition: color 0.2s;
 }
 
 .closeButton:hover {
-  color: #262626;
+  color: #bf424c;
 }
 
 .form {
-  padding: 20px;
+  padding: 16px;
 }
 
 .formGroup {
@@ -114,11 +121,11 @@
 .cancelButton,
 .submitButton {
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.1s;
 }
 
 .cancelButton {
@@ -142,8 +149,28 @@
   background: #2e4b4f;
 }
 
-.cancelButton:disabled,
-.submitButton:disabled {
-  opacity: 0.7;
+.submitButton:hover, .cancelButton:hover {
+  filter: brightness(0.97);
+  box-shadow: 0 2px 8px rgba(58, 94, 99, 0.08);
+  transform: translateY(-1px);
+}
+
+.submitButton:active, .cancelButton:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+.submitButton:focus-visible, .cancelButton:focus-visible {
+  outline: 2px solid #3a5e63;
+  outline-offset: 2px;
+}
+
+.submitButton:disabled, .cancelButton:disabled {
+  color: #cccccc !important;
+  background: #f5f5f5 !important;
+  opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+  transform: none;
 } 

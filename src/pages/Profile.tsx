@@ -10,6 +10,7 @@ import styles from './Profile.module.css';
 import { userService, postService } from '../services';
 import type { User, FollowUser } from '../services/userService';
 import type { Post, Comment } from '../services/postService';
+import { usePostModalContext } from '../components/post/PostModalProvider';
 
 interface PostModalProps {
   post: Post;
@@ -36,6 +37,7 @@ const Profile: React.FC = () => {
   const [following, setFollowing] = useState<FollowUser[]>([]);
   const [showUnfollowDropdown, setShowUnfollowDropdown] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
+  const { openPostModal } = usePostModalContext();
 
   useEffect(() => {
     if (username) {
@@ -170,6 +172,7 @@ const Profile: React.FC = () => {
   const handlePostClick = (post: Post) => {
     setSelectedPost(post);
     setShowPostModal(true);
+    openPostModal(post);
   };
 
   const handleDeleteClick = (post: Post, event: React.MouseEvent) => {
@@ -397,17 +400,6 @@ const Profile: React.FC = () => {
             users={following}
             title="Following"
             onClose={() => setShowFollowing(false)}
-          />
-        )}
-
-        {showPostModal && selectedPost && (
-          <PostModal
-            post={selectedPost}
-            onClose={() => {
-              setShowPostModal(false);
-              setSelectedPost(null);
-            }}
-            onLikeUpdate={handleLikeUpdate}
           />
         )}
       </main>

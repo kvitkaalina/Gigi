@@ -611,4 +611,16 @@
   font-size: 11px;
   margin-top: 10px;
   margin-right: 2px;
+}
+
+.messageImageOnly time {
+  display: block;
+  position: static;
+  margin: 8px 0 0 auto;
+  font-size: 11px;
+  color: #8e8e8e;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+  text-align: right;
 } 

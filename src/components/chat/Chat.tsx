@@ -101,6 +101,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
       const message = await chatService.sendMessage(chat.user._id, newMessage.trim(), 'text');
       setNewMessage('');
       onNewSocketMessage(message);
+      await chatApi.markAsRead(chat.user._id);
       const container = messagesContainerRef.current;
       if (container) {
         const scrollHeight = container.scrollHeight;

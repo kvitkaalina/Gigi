@@ -72,11 +72,13 @@
   font-size: 16px;
   cursor: pointer;
   color: #acacac;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
   transition: color 0.2s;
 }
 
@@ -189,4 +191,36 @@
 .footer {
   border-bottom: none !important;
   border-top: none !important;
+}
+
+.repostButton, .closeButton, .newChatButton {
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.1s;
+  cursor: pointer;
+}
+
+.repostButton:hover, .closeButton:hover, .newChatButton:hover {
+  filter: brightness(0.97);
+  box-shadow: 0 2px 8px rgba(58, 94, 99, 0.08);
+  transform: translateY(-1px);
+}
+
+.repostButton:active, .closeButton:active, .newChatButton:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+.repostButton:focus-visible, .closeButton:focus-visible, .newChatButton:focus-visible {
+  outline: 2px solid #3a5e63;
+  outline-offset: 2px;
+}
+
+.repostButton:disabled, .closeButton:disabled, .newChatButton:disabled {
+  color: #cccccc !important;
+  background: #f5f5f5 !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+  transform: none;
 } 

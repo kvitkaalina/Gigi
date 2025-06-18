@@ -47,31 +47,53 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
     }
   };
 
+  // Сортировка чатов по времени последнего сообщения (новые сверху)
+  const sortedChats = [...chats].sort((a, b) => {
+    const aTime = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
+    const bTime = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+    return bTime - aTime;
+  });
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+        {isSearching && (
+          <button
+            className={styles.backButton}
+            onClick={() => {
+              setIsSearching(false);
+              setSearchQuery('');
+              setSearchResults([]);
+            }}
+            aria-label="Back to chat list"
+            style={{ marginRight: 8 }}
+          >
+            <i className="fas fa-arrow-left"></i>
+          </button>
+        )}
         <h2>Messages</h2>
         <button
           className={styles.newChatButton}
           onClick={() => setIsSearching(true)}
+          aria-label="Start new chat"
         >
           <i className="fas fa-plus"></i>
         </button>
       </div>
+      <div className={styles.headerDivider}></div>
 
       {isSearching ? (
         <div className={styles.searchContainer}>
           <div className={styles.searchHeader}>
-            {/* Кнопка Back удалена */}
-          </div>
-          <div className={styles.searchInputContainer}>
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className={styles.searchInput}
-            />
+            <div className={styles.searchInputContainer}>
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
           </div>
           <div className={styles.searchResults}>
             {isLoading ? (
@@ -104,8 +126,8 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
         </div>
       ) : (
         <div className={styles.chatList}>
-          {chats.length > 0 &&
-            chats.map((chat) => (
+          {sortedChats.length > 0 &&
+            sortedChats.map((chat) => (
               <div
                 key={chat._id}
                 className={`${styles.chatItem} ${
@@ -129,9 +151,39 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                   <div className={styles.chatItemName}>{chat.user.username}</div>
                   <div className={styles.lastMessage}>
                     <span className={styles.messageText}>
-                      {chat.lastMessage?.type === 'image'
-                        ? '🖼️ Фото'
-                        : chat.lastMessage?.content || 'No messages yet'}
+                      {chat.lastMessage ? (
+                        chat.lastMessage.type === 'image' ? (
+                          <>
+                            <span role="img" aria-label="Photo" style={{marginRight: 4}}>🖼️</span>Photo
+                          </>
+                        ) : chat.lastMessage.type === 'repost' ? (
+                          <>
+                            <span style={{marginRight: 4, display: 'inline-flex', verticalAlign: 'middle'}}>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3a5e63" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="17 1 21 5 17 9"/>
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                <polyline points="7 23 3 19 7 15"/>
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                              </svg>
+                            </span>
+                            Repost
+                            {chat.lastMessage.postId?.author?.username && (
+                              <span style={{marginLeft: 4, color: '#888'}}>
+                                {chat.lastMessage.postId.author.username}
+                              </span>
+                            )}
+                            {chat.lastMessage.postId?.description && (
+                              <span style={{marginLeft: 4, color: '#bbb', fontStyle: 'italic'}}>
+                                {chat.lastMessage.postId.description}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          chat.lastMessage.content
+                        )
+                      ) : (
+                        ''
+                      )}
                     </span>
                     {chat.lastMessage && (
                       <span className={styles.messageTime}>
@@ -142,7 +194,7 @@ export const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelec
                     )}
                   </div>
                 </div>
-                {chat.unreadCount > 0 && (
+                {chat.unreadCount > 0 && localStorage.getItem('userId') !== chat.lastMessage?.sender?._id && (
                   <div className={styles.unreadCount}>{chat.unreadCount}</div>
                 )}
               </div>

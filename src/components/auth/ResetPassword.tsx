@@ -54,12 +54,6 @@ const ResetPassword: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.formBox}>
-        <div className={styles.lockIconContainer}>
-          <div className={styles.lockIcon}>
-            <i className="fas fa-lock"></i>
-          </div>
-        </div>
-
         <h3 className={styles.title}>Reset Your Password</h3>
         <p className={styles.description}>
           Please enter your new password below.

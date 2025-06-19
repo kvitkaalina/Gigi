@@ -61,12 +61,12 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
       }
     },
     onUserTyping: (userId: string) => {
-      if (chat.user._id === userId) {
+      if (chat.user._id === userId && userId !== currentUserId) {
         setIsTyping(true);
       }
     },
     onUserStopTyping: (userId: string) => {
-      if (chat.user._id === userId) {
+      if (chat.user._id === userId && userId !== currentUserId) {
         setIsTyping(false);
       }
     },

@@ -251,13 +251,26 @@ button:disabled, .block:disabled, .unblock:disabled, .delete:disabled, .usersBut
   
   .userList th,
   .userList td {
-    padding: 8px 6px;
+    padding: 8px 4px;
   }
   
   .block, .unblock, .delete {
-    padding: 4px 8px;
-    font-size: 11px;
-    margin-right: 4px;
+    display: block;
+    width: 100%;
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    padding: 5px 0;
+  }
+  
+  .block {
+    margin-right: 0;
+  }
+  
+  .actionsCell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 70px;
   }
   
   .blocked, .active {
@@ -286,9 +299,12 @@ button:disabled, .block:disabled, .unblock:disabled, .delete:disabled, .usersBut
   }
   
   .block, .unblock, .delete {
-    padding: 3px 6px;
-    font-size: 10px;
-    margin-right: 2px;
+    font-size: 11px;
+    padding: 4px 0;
+  }
+  
+  .actionsCell {
+    min-width: 60px;
   }
   
   .blocked, .active {

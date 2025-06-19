@@ -82,26 +82,25 @@
   .layout {
     flex-direction: column;
   }
-  
   .sidebarWrapper {
     display: none;
   }
-  
   .mainContent {
     flex-direction: column;
-    padding: 16px 12px;
-    padding-bottom: 80px; /* Место для мобильной навигации */
+    padding: 8px 4px;
+    padding-bottom: 60px; /* Место для мобильной навигации */
+    gap: 8px;
   }
-  
   .notificationsWrapper {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
+    max-width: 100vw;
   }
-  
   .postsInfoWrapper {
     width: 100%;
+    margin-top: 0;
+    padding: 0;
   }
-  
   .postsInfoWrapper :global(.navigation),
   .postsInfoWrapper :global(.copyright) {
     display: none !important;
@@ -110,8 +109,13 @@
 
 @media (max-width: 480px) {
   .mainContent {
-    padding: 12px 8px;
-    padding-bottom: 80px;
+    padding: 4px 2px;
+    padding-bottom: 60px;
+    gap: 4px;
+  }
+  .notificationsWrapper {
+    margin-bottom: 4px;
+    padding: 0;
   }
 }
 

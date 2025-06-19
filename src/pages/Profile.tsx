@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/navigation/Sidebar';
 import MobileNav from '../components/navigation/MobileNav';
@@ -39,6 +39,8 @@ const Profile: React.FC = () => {
   const [showUnfollowDropdown, setShowUnfollowDropdown] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const { openPostModal } = usePostModalContext();
+  const [showChangeAvatar, setShowChangeAvatar] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (username) {
@@ -46,6 +48,17 @@ const Profile: React.FC = () => {
       fetchUserPosts();
     }
   }, [username]);
+
+  useEffect(() => {
+    if (!showChangeAvatar) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+        setShowChangeAvatar(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showChangeAvatar]);
 
   const checkFollowStatus = async (userId: string) => {
     try {
@@ -259,25 +272,31 @@ const Profile: React.FC = () => {
       <main className={styles.main}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatarContainer}>
-              <img 
-                src={user.avatar ? `http://localhost:5001${user.avatar}` : '/images/my-avatar-placeholder.png'} 
-                alt={user.username} 
+            <div
+              className={styles.avatarContainer}
+              ref={avatarRef}
+              onClick={() => setShowChangeAvatar((v) => !v)}
+              tabIndex={0}
+              style={{ cursor: 'pointer' }}
+            >
+              <img
+                src={user.avatar ? `http://localhost:5001${user.avatar}` : '/images/my-avatar-placeholder.png'}
+                alt={user.username}
                 className={styles.avatar}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = '/images/my-avatar-placeholder.png';
                 }}
               />
-              {isOwnProfile && (
-                <label className={styles.changeAvatarButton}>
+              {isOwnProfile && showChangeAvatar && (
+                <label className={styles.changeAvatarButton} onClick={e => e.stopPropagation()}>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleAvatarChange}
                     style={{ display: 'none' }}
                   />
-                  Change Photo
+                  Change<br />photo
                 </label>
               )}
             </div>

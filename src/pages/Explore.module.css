@@ -313,21 +313,42 @@
   .explorePage {
     margin-left: 0;
     max-width: 100%;
-    padding: 20px 15px;
+    padding: 20px 8px;
     padding-bottom: 80px;
   }
-
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 2px;
+    height: auto;
+  }
+  .gridItem {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0;
+    min-height: unset;
+    max-height: unset;
+    display: flex;
+    flex-direction: column;
+  }
+  .postImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+  }
   .title {
     font-size: 18px;
   }
-
   .header {
     flex-direction: column;
     gap: 16px;
     padding: 16px;
     margin-bottom: 24px;
   }
-
   .refreshButton {
     padding: 6px 12px;
     font-size: 12px;
@@ -337,21 +358,19 @@
 
 @media (max-width: 480px) {
   .explorePage {
-    padding: 15px 10px;
+    padding: 10px 2px;
     padding-bottom: 80px;
   }
-  
   .grid {
     grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 0 4px;
+    gap: 8px;
+    padding: 0 2px;
     height: auto;
   }
-  
   .gridItem {
     margin: 0;
     width: 100%;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     height: auto;
     min-height: unset;
@@ -359,19 +378,16 @@
     display: flex;
     flex-direction: column;
   }
-  
   .postImage {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 12px;
+    border-radius: 10px;
     object-fit: cover;
   }
-
   .postInfo {
     font-size: 12px;
   }
-
   .authorAvatar {
     width: 24px;
     height: 24px;

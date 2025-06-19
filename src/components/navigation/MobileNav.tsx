@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from '../search/SearchBar';
 import styles from './MobileNav.module.css';
 import type { SearchUser } from '../../services/searchService';
+import AuthService from '../../utils/auth';
 
 const MobileNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const isAdmin = AuthService.isAdmin();
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -87,6 +89,16 @@ const MobileNav: React.FC = () => {
           <i className="far fa-user"></i>
           <span>Profile</span>
         </button>
+        {isAdmin && (
+          <button
+            className={`${styles.navItem} ${isActive('/admin') ? styles.active : ''}`}
+            onClick={() => navigate('/admin')}
+            aria-label="Admin Panel"
+          >
+            <i className="fas fa-briefcase"></i>
+            <span>Admin Panel</span>
+          </button>
+        )}
       </nav>
 
       {isSearchOpen && (

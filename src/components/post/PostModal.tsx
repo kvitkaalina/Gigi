@@ -234,6 +234,7 @@ const PostModal: React.FC<PostModalProps> = ({
                 alt={post.author?.username}
                 className={styles.avatar}
                 onClick={(e) => handleCommentClick(post.author.username, e)}
+                onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/my-avatar-placeholder.png'; }}
               />
               <span
                 className={styles.username}
@@ -276,6 +277,7 @@ const PostModal: React.FC<PostModalProps> = ({
                     src={comment.user?.avatar ? `${API_BASE_URL}${comment.user.avatar}` : '/images/my-avatar-placeholder.png'}
                     alt={comment.user?.username}
                     className={styles.commentAvatar}
+                    onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/my-avatar-placeholder.png'; }}
                   />
                   <div className={styles.commentText}>
                     <div className={styles.commentHeaderRow}>

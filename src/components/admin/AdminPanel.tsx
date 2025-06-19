@@ -66,59 +66,61 @@ const AdminPanel: React.FC = () => {
     if (error) return <div className={styles.error}>{error}</div>;
 
     return (
-        <div className={styles.adminPanel}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa' }}>
             <Sidebar />
-            <MobileNav />
-            <div className={styles.adminContent}>
-                <button className={styles.backButton} onClick={handleBack}>
-                    <i className="fas fa-arrow-left"></i>
-                    Back
-                </button>
-                <h1>Admin Panel</h1>
-                <div className={styles.userList}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Role</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map(user => (
-                                <tr key={user._id}>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td>
-                                        <span className={user.isBlocked ? styles.blocked : styles.active}>
-                                            {user.isBlocked ? 'Blocked' : 'Active'}
-                                        </span>
-                                    </td>
-                                    <td>{user.role}</td>
-                                    <td>
-                                        {user.role !== 'admin' && (
-                                            <>
-                                                <button
-                                                    onClick={() => handleToggleBlock(user._id)}
-                                                    className={user.isBlocked ? styles.unblock : styles.block}
-                                                >
-                                                    {user.isBlocked ? 'Unblock' : 'Block'}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteUser(user._id)}
-                                                    className={styles.delete}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </>
-                                        )}
-                                    </td>
+            <div style={{ flex: 1 }}>
+                <MobileNav />
+                <div className={styles.adminContent}>
+                    <button className={styles.backButton} onClick={handleBack}>
+                        <i className="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <h1>Admin Panel</h1>
+                    <div className={styles.userList}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {users.map(user => (
+                                    <tr key={user._id}>
+                                        <td>{user.username}</td>
+                                        <td>{user.email}</td>
+                                        <td>
+                                            <span className={user.isBlocked ? styles.blocked : styles.active}>
+                                                {user.isBlocked ? 'Blocked' : 'Active'}
+                                            </span>
+                                        </td>
+                                        <td>{user.role}</td>
+                                        <td>
+                                            {user.role !== 'admin' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleToggleBlock(user._id)}
+                                                        className={user.isBlocked ? styles.unblock : styles.block}
+                                                    >
+                                                        {user.isBlocked ? 'Unblock' : 'Block'}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user._id)}
+                                                        className={styles.delete}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

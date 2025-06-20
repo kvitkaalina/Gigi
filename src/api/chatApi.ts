@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { IMessage, IChat, IUser } from '../types/chat';
 import { API_URL } from '../config';
+import { IPost } from '../types/post';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -121,6 +122,16 @@ const chatApi = {
     try {
       await api.patch(`/messages/${messageId}`, { content });
     } catch (error) {
+      return handleError(error as AxiosError);
+    }
+  },
+
+  getPostById: async (postId: string): Promise<IPost> => {
+    try {
+      const response = await api.get<IPost>(`/posts/${postId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching post by ID:', error);
       return handleError(error as AxiosError);
     }
   }

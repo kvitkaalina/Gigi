@@ -7,9 +7,10 @@ interface RepostModalProps {
   postId: string;
   onClose: () => void;
   onRepost: (chatId: string, comment: string) => void;
+  sourcePage?: 'home' | 'profile';
 }
 
-const RepostModal: React.FC<RepostModalProps> = ({ postId, onClose, onRepost }) => {
+const RepostModal: React.FC<RepostModalProps> = ({ postId, onClose, onRepost, sourcePage }) => {
   const [selectedChat, setSelectedChat] = useState<IChat | null>(null);
   const [comment, setComment] = useState('');
   const [chats, setChats] = useState<IChat[]>([]);
@@ -37,12 +38,16 @@ const RepostModal: React.FC<RepostModalProps> = ({ postId, onClose, onRepost }) 
     }
   };
 
+  const handleCloseModal = () => {
+    onClose();
+  };
+
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={handleCloseModal}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.header}>
           <h2>Share Post</h2>
-          <button className={styles.closeButton} onClick={onClose}>
+          <button className={styles.closeButton} onClick={handleCloseModal}>
             <i className="fas fa-times"></i>
           </button>
         </div>

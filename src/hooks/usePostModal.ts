@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import type { Post } from '../services/postService';
 
 interface OpenModalOptions {
   focusCommentId?: string;
   scrollToComments?: boolean;
+  onClose?: () => void;
 }
 
 export const usePostModal = () => {
@@ -11,31 +12,25 @@ export const usePostModal = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [focusedCommentId, setFocusedCommentId] = useState<string | undefined>(undefined);
   const [shouldScrollToComments, setShouldScrollToComments] = useState(false);
+  const [customOnClose, setCustomOnClose] = useState<(() => void) | null>(null);
 
-  const openModal = useCallback((post: Post, options?: OpenModalOptions) => {
+  const openModal = (post: Post, options?: OpenModalOptions) => {
     setSelectedPost(post);
     setFocusedCommentId(options?.focusCommentId);
-    setShouldScrollToComments(options?.scrollToComments || false);
-    setTimeout(() => {
-      setIsModalOpen(true);
-    }, 0);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-    setTimeout(() => {
-      setSelectedPost(null);
-      setFocusedCommentId(undefined);
-      setShouldScrollToComments(false);
-    }, 300);
-  }, []);
-
-  return {
-    isModalOpen,
-    selectedPost,
-    focusedCommentId,
-    shouldScrollToComments,
-    openModal,
-    closeModal
+    setShouldScrollToComments(options?.scrollToComments ?? false);
+    if (options?.onClose) {
+      setCustomOnClose(() => options.onClose);
+    }
+    setIsModalOpen(true);
   };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+    setFocusedCommentId(undefined);
+    setShouldScrollToComments(false);
+    setCustomOnClose(null);
+  };
+
+  return { isModalOpen, selectedPost, focusedCommentId, shouldScrollToComments, openModal, closeModal, customOnClose };
 }; 

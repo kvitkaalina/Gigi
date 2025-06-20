@@ -331,19 +331,40 @@ const Home: React.FC = () => {
     navigate(`/profile/${username}`);
   };
 
+  const handleRepost = async (chatId: string, comment: string) => {
+    if (showRepostModalForPostId) {
+      try {
+        await chatService.sendMessage(
+          chatId,
+          '',
+          'repost',
+          showRepostModalForPostId,
+          comment
+        );
+        setShowRepostModalForPostId(null);
+      } catch (error) {
+        console.error('Failed to repost:', error);
+      }
+    }
+  };
+
   const handleEmojiSelect = (postId: string, emoji: any) => {
-    if (!inputRefs.current[postId]) return;
-    const input = inputRefs.current[postId]!;
-    const start = input.selectionStart || 0;
-    const end = input.selectionEnd || 0;
-    const emojiChar = emoji.native || '';
-    const newValue = (newComments[postId] || '').slice(0, start) + emojiChar + (newComments[postId] || '').slice(end);
-    setNewComments(prev => ({ ...prev, [postId]: newValue }));
-    setShowEmojiPicker(prev => ({ ...prev, [postId]: false }));
+    const inputRef = inputRefs.current[postId];
+    if (!inputRef) return;
+    
+    const start = inputRef.selectionStart ?? 0;
+    const end = inputRef.selectionEnd ?? 0;
+    const text = newComments[postId] || '';
+    const newText = text.substring(0, start) + emoji.native + text.substring(end);
+    setNewComments(prev => ({ ...prev, [postId]: newText }));
+    
     setTimeout(() => {
-      input.focus();
-      input.selectionStart = input.selectionEnd = start + emojiChar.length;
+      inputRef.focus();
+      const newCursorPos = start + emoji.native.length;
+      inputRef.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
+
+    setShowEmojiPicker(prev => ({ ...prev, [postId]: false }));
   };
 
   const handleEmojiButtonClick = (postId: string, e: React.MouseEvent) => {
@@ -370,24 +391,6 @@ const Home: React.FC = () => {
 
   const handleOpenRepostModal = (post: Post) => {
     setShowRepostModalForPostId(post._id);
-  };
-
-  const handleRepost = async (chatId: string, comment: string) => {
-    try {
-      const postId = showRepostModalForPostId;
-      if (!postId) return;
-      await chatService.sendMessage(
-        chatId,
-        '', // content пустой для репоста
-        'repost',
-        postId,
-        comment
-      );
-      // Можно добавить уведомление или обновить UI
-    } catch (error) {
-      console.error('Ошибка при отправке репоста:', error);
-      alert('Не удалось отправить репост');
-    }
   };
 
   const renderComment = (post: Post, comment: Comment) => {
@@ -562,7 +565,10 @@ const Home: React.FC = () => {
                 borderRadius: 16,
                 background: '#fff'
               }}>
-                <Picker onEmojiSelect={emoji => handleEmojiSelect(post._id, emoji)} theme="light" />
+                <Picker 
+                  onEmojiSelect={(emoji: { native: string }) => handleEmojiSelect(post._id, emoji)} 
+                  theme="light" 
+                />
               </div>
             )}
             <input
@@ -596,6 +602,7 @@ const Home: React.FC = () => {
             postId={post._id}
             onClose={() => setShowRepostModalForPostId(null)}
             onRepost={handleRepost}
+            sourcePage="home"
           />
         )}
       </div>

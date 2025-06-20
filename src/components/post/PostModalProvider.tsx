@@ -7,7 +7,7 @@ import type { Post } from '../../services/postService';
 interface OpenModalOptions {
   focusCommentId?: string;
   scrollToComments?: boolean;
-  preventNavigationOnClose?: boolean;
+  onClose?: () => void;
 }
 
 interface PostModalContextType {
@@ -27,29 +27,36 @@ export const usePostModalContext = () => {
 export const PostModalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isModalOpen, selectedPost, focusedCommentId, shouldScrollToComments, openModal, closeModal } = usePostModal();
+  const { 
+    isModalOpen, 
+    selectedPost, 
+    focusedCommentId, 
+    shouldScrollToComments, 
+    openModal, 
+    closeModal, 
+    customOnClose 
+  } = usePostModal();
 
   const handleClose = () => {
-    // Предотвращаем множественные вызовы
     if (!isModalOpen) return;
-    
-    // Определяем, является ли текущий маршрут страницей поста
-    const isPostPage = location.pathname.startsWith('/post/');
-    
-    // Закрываем модальное окно
-    closeModal();
-    
-    // Если мы на странице поста, возвращаемся на предыдущую страницу
-    // чтобы избежать пустого экрана
-    if (isPostPage) {
-      setTimeout(() => {
-        navigate(-1); // Возвращаемся на один шаг назад
-      }, 100);
+
+    // First, execute the custom handler if it exists
+    if (customOnClose) {
+      customOnClose();
+    } else {
+      // Default behavior: go back if we are on a dedicated post page
+      const isPostPage = location.pathname.startsWith('/post/');
+      if (isPostPage) {
+        navigate(-1);
+      }
     }
+    
+    // Finally, always close the modal state
+    closeModal();
   };
 
   const handleLikeUpdate = (postId: string, hasLiked: boolean, likesCount: number) => {
-    // Здесь можно добавить обновление состояния поста в родительском компоненте
+    // This is a placeholder for future functionality if needed
   };
 
   return (

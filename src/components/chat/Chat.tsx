@@ -8,6 +8,7 @@ import styles from './Chat.module.css';
 import { useNavigate } from 'react-router-dom';
 import Picker from '@emoji-mart/react';
 import chatService from '../../services/chatService';
+import { usePostModalContext } from '../post/PostModalProvider';
 
 interface ChatProps {
   chat: IChat;
@@ -34,6 +35,8 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const { openPostModal } = usePostModalContext();
+  const [authorToNav, setAuthorToNav] = useState<string | null>(null);
   
   const isUserAtBottom = useCallback(() => {
     const container = messagesContainerRef.current;
@@ -201,6 +204,13 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     });
   }, [chat._id]);
 
+  useEffect(() => {
+    if (authorToNav) {
+      navigate(`/profile/${authorToNav}`);
+      setAuthorToNav(null);
+    }
+  }, [authorToNav, navigate]);
+
   const handleViewProfile = () => {
     navigate(`/profile/${chat.user.username}`);
   };
@@ -263,6 +273,29 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     }, 0);
   };
 
+  const handleRepostClick = async (message: IMessage) => {
+    if (message.type === 'repost' && message.postId?._id) {
+      try {
+        const post = await chatApi.getPostById(message.postId._id);
+        const adaptedPost = {
+          ...post,
+          comments: post.comments.map(c => ({ ...c, text: c.content, user: c.author })),
+        };
+        if (adaptedPost.author?.username) {
+          setAuthorToNav(adaptedPost.author.username);
+        }
+        openPostModal(adaptedPost, {
+          onClose: () => {
+            // Custom close handler for chat - just close the modal without navigation
+            // The navigation to profile will be handled by the useEffect that watches authorToNav
+          }
+        });
+      } catch (error) {
+        console.error("Failed to fetch post details:", error);
+      }
+    }
+  };
+
   const renderMessage = (message: IMessage) => {
     const isOwn = message.sender._id === currentUserId;
     const isImage = message.type === 'image';
@@ -274,6 +307,7 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
         key={message._id}
         className={`${styles.message} ${isOwn ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
         style={{ position: 'relative' }}
+        onClick={isRepost ? () => handleRepostClick(message) : undefined}
       >
         {isImage ? (
           <>
@@ -281,11 +315,17 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
               src={`${STATIC_URL}${message.content}`} 
               alt="Message attachment" 
               className={styles.messageImage}
-              onClick={() => window.open(`${STATIC_URL}${message.content}`, '_blank')}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`${STATIC_URL}${message.content}`, '_blank');
+              }}
             />
             <time>{formatMessageTime(message)}</time>
             {isOwn && (
-              <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">
+              <button className={styles.deleteButton} onClick={(e) => {
+                e.stopPropagation();
+                onDeleteMessage(message._id);
+              }} title="Delete message">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6L6 18" />
                   <path d="M6 6l12 12" />
@@ -299,7 +339,10 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
               <i className="fas fa-paper-plane" style={{ fontSize: 13, color: '#b0b0b0', opacity: 0.7 }}></i>
             </span>
             {isOwn && (
-              <button className={styles.repostDeleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete repost">
+              <button className={styles.repostDeleteButton} onClick={(e) => {
+                e.stopPropagation();
+                onDeleteMessage(message._id);
+              }} title="Delete repost">
                 <i className="fas fa-times"></i>
               </button>
             )}
@@ -308,7 +351,6 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
                 src={message.postId?.image ? `${STATIC_URL}${message.postId.image}` : '/images/my-avatar-placeholder.png'} 
                 alt="Reposted post" 
                 className={styles.repostImage}
-                onClick={() => navigate(`/post/${message.postId?._id}`)}
               />
             </div>
             <div className={styles.repostMeta}>
@@ -335,12 +377,18 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
                   rows={1}
                 />
                 <div className={styles.editButtons}>
-                  <button className={styles.saveButton} onClick={() => handleEditSave(message._id)} title="Save">
+                  <button className={styles.saveButton} onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditSave(message._id);
+                  }} title="Save">
                     <svg viewBox="0 0 24 24">
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </button>
-                  <button className={styles.cancelButton} onClick={handleEditCancel} title="Cancel">
+                  <button className={styles.cancelButton} onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditCancel();
+                  }} title="Cancel">
                     <svg viewBox="0 0 24 24">
                       <path d="M18 6L6 18" />
                       <path d="M6 6l12 12" />
@@ -353,13 +401,19 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
                 <p>{message.content}</p>
                 {isOwn && (
                   <>
-                    <button className={styles.editButton} onClick={() => handleEditClick(message)} title="Edit message">
+                    <button className={styles.editButton} onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditClick(message);
+                    }} title="Edit message">
                       <svg viewBox="0 0 24 24">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                       </svg>
                     </button>
-                    <button className={styles.deleteButton} onClick={() => onDeleteMessage(message._id)} title="Delete message">
+                    <button className={styles.deleteButton} onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteMessage(message._id);
+                    }} title="Delete message">
                       <svg viewBox="0 0 24 24">
                         <path d="M18 6L6 18" />
                         <path d="M6 6l12 12" />

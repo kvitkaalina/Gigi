@@ -295,7 +295,6 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
         key={message._id}
         className={`${styles.message} ${isOwn ? styles.sent : styles.received} ${isImage ? styles.messageImageOnly : ''}`}
         style={{ position: 'relative' }}
-        onClick={isRepost ? () => handleRepostClick(message) : undefined}
       >
         {isImage ? (
           <>
@@ -339,10 +338,41 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
                 src={message.postId?.image ? `${STATIC_URL}${message.postId.image}` : '/images/my-avatar-placeholder.png'} 
                 alt="Reposted post" 
                 className={styles.repostImage}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRepostClick(message);
+                }}
+                style={{ cursor: 'pointer' }}
               />
             </div>
             <div className={styles.repostMeta}>
-              <span className={styles.repostAuthor}>{message.postId?.author?.username}</span>
+              {message.postId?.author?.avatar && (
+                <img
+                  src={message.postId.author.avatar.startsWith('http') ? message.postId.author.avatar : `${STATIC_URL}${message.postId.author.avatar}`}
+                  alt={message.postId.author.username}
+                  className={styles.avatar}
+                  style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (message.postId?.author?.username) {
+                      navigate(`/profile/${message.postId.author.username}`);
+                    }
+                  }}
+                  onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/my-avatar-placeholder.png'; }}
+                />
+              )}
+              <span
+                className={styles.repostAuthor}
+                style={{ cursor: 'pointer' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (message.postId?.author?.username) {
+                    navigate(`/profile/${message.postId.author.username}`);
+                  }
+                }}
+              >
+                {message.postId?.author?.username}
+              </span>
               {message.postId?.description && (
                 <span className={styles.repostDescription}>{message.postId.description}</span>
               )}

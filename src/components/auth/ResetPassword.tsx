@@ -34,7 +34,8 @@ const ResetPassword: React.FC = () => {
         AuthService.setUserData({
           token: response.data.token,
           userId: response.data._id,
-          username: response.data.username
+          username: response.data.username,
+          role: response.data.role
         });
         
         // Перенаправляем на профиль

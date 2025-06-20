@@ -36,7 +36,6 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
   const inputRef = useRef<HTMLInputElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const { openPostModal } = usePostModalContext();
-  const [authorToNav, setAuthorToNav] = useState<string | null>(null);
   
   const isUserAtBottom = useCallback(() => {
     const container = messagesContainerRef.current;
@@ -204,13 +203,6 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
     });
   }, [chat._id]);
 
-  useEffect(() => {
-    if (authorToNav) {
-      navigate(`/profile/${authorToNav}`);
-      setAuthorToNav(null);
-    }
-  }, [authorToNav, navigate]);
-
   const handleViewProfile = () => {
     navigate(`/profile/${chat.user.username}`);
   };
@@ -281,13 +273,9 @@ export const Chat: React.FC<ChatProps> = ({ chat, messages, onSendMessage, onNew
           ...post,
           comments: post.comments.map(c => ({ ...c, text: c.content, user: c.author })),
         };
-        if (adaptedPost.author?.username) {
-          setAuthorToNav(adaptedPost.author.username);
-        }
         openPostModal(adaptedPost, {
           onClose: () => {
-            // Custom close handler for chat - just close the modal without navigation
-            // The navigation to profile will be handled by the useEffect that watches authorToNav
+            // Custom close handler for chat - just close the modal and stay in chat
           }
         });
       } catch (error) {

@@ -12,6 +12,7 @@ interface OpenModalOptions {
 
 interface PostModalContextType {
   openPostModal: (post: Post, options?: OpenModalOptions) => void;
+  closeModal: () => void;
 }
 
 const PostModalContext = createContext<PostModalContextType | undefined>(undefined);
@@ -60,7 +61,7 @@ export const PostModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <PostModalContext.Provider value={{ openPostModal: openModal }}>
+    <PostModalContext.Provider value={{ openPostModal: openModal, closeModal }}>
       {children}
       {isModalOpen && selectedPost && (
         <PostModal

@@ -4,6 +4,7 @@ import SearchBar from '../search/SearchBar';
 import styles from './Sidebar.module.css';
 import type { SearchUser } from '../../services/searchService';
 import AuthService from '../../utils/auth';
+import { usePostModalContext } from '../post/PostModalProvider';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -11,8 +12,10 @@ const Sidebar: React.FC = () => {
   const username = localStorage.getItem('username');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const isAdmin = AuthService.isAdmin();
+  const { closeModal } = usePostModalContext();
 
   const handleLogout = () => {
+    closeModal();
     AuthService.logout();
     navigate('/login');
   };

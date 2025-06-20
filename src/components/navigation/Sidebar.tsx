@@ -13,10 +13,8 @@ const Sidebar: React.FC = () => {
   const isAdmin = AuthService.isAdmin();
 
   const handleLogout = () => {
-    // Очищаем все данные пользователя
-    localStorage.clear();
-    // Принудительно обновляем страницу для сброса всего состояния приложения
-    window.location.href = '/login';
+    AuthService.logout();
+    navigate('/login');
   };
 
   const handleUserSelect = (user: SearchUser) => {

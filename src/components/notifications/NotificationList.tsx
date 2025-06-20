@@ -5,12 +5,14 @@ import { API_BASE_URL } from '../../services/config';
 import { getAssetUrl } from '../../utils/urls';
 import styles from './NotificationList.module.css';
 import { formatDistanceToNow } from 'date-fns';
+import { usePostModalContext } from '../post/PostModalProvider';
 
 const NotificationList: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { openPostModal } = usePostModalContext();
 
   useEffect(() => {
     fetchNotifications();
@@ -97,17 +99,23 @@ const NotificationList: React.FC = () => {
       await handleMarkAsRead(notification._id);
     }
 
-    setTimeout(() => {
-      if ((notification.type === 'like' || notification.type === 'comment') && notification.target?._id) {
-        console.log('Navigating to post:', notification.target._id);
-        navigate(`/post/${notification.target._id}`);
-      } else if (notification.type === 'follow' && notification.actor?.username) {
-        console.log('Navigating to profile:', notification.actor.username);
-        navigate(`/profile/${notification.actor.username}`);
-      } else {
-        console.warn('Missing required data for navigation:', { notification });
+    if ((notification.type === 'like' || notification.type === 'comment') && notification.target?._id) {
+      try {
+        setLoading(true);
+        const fullPost = await notificationService.getPostById(notification.target._id);
+        openPostModal(fullPost, { preventNavigationOnClose: true });
+      } catch (error) {
+        console.error('Failed to fetch post details:', error);
+        setError('Could not load the post. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    }, 100);
+    } else if (notification.type === 'follow' && notification.actor?.username) {
+      console.log('Navigating to profile:', notification.actor.username);
+      navigate(`/profile/${notification.actor.username}`);
+    } else {
+      console.warn('Missing required data for navigation or modal opening:', { notification });
+    }
   };
 
   const getNotificationText = (notification: Notification): string => {

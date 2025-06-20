@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SearchBar from '../search/SearchBar';
 import styles from './Navbar.module.css';
 import type { SearchUser } from '../../services/searchService';
+import AuthService from '../../utils/auth';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(AuthService.isAdmin());
+  }, []);
 
   const handleLogout = () => {
-    // Очищаем все данные пользователя
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    // Перенаправляем на страницу логина
+    AuthService.logout();
     navigate('/login');
   };
 
@@ -51,6 +53,11 @@ const Navbar: React.FC = () => {
             <Link to="/profile" className={styles.navItem}>
               <i className="fas fa-user"></i>
             </Link>
+            {isAdmin && (
+              <Link to="/admin" className={styles.navItem}>
+                <i className="fas fa-user-shield"></i>
+              </Link>
+            )}
             <button onClick={handleLogout} className={styles.navItem}>
               <i className="fas fa-sign-out-alt"></i>
             </button>

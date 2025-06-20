@@ -89,7 +89,7 @@ const CreatePost: React.FC = () => {
                   <img src={preview} alt="Preview" className={styles.previewImage} />
                 ) : (
                   <div style={{textAlign: 'center'}}>
-                    <img src="/images/img.png" alt="Upload" width={64} height={64} style={{display: 'block', margin: '0 auto 16px'}} />
+                    <img src="/images/img.png" alt="Upload" width={100} height={100} style={{display: 'block', margin: '0 auto 16px'}} />
                     <p className={styles.uploadText}>
                       Drag and drop your image here, or click to select
                     </p>

@@ -1,4 +1,5 @@
 import { API_BASE_URL, getAuthHeaders, handleApiResponse } from './config';
+import { Post } from './postService'; // Импортируем тип Post
 
 export interface Notification {
   _id: string;
@@ -70,5 +71,10 @@ export const notificationService = {
         })
       )
     );
-  }
+  },
+
+  getPostById: async (postId: string): Promise<Post> => {
+    const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
+    return handleApiResponse(response);
+  },
 }; 

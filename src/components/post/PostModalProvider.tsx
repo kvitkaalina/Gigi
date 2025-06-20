@@ -32,14 +32,20 @@ export const PostModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const handleClose = () => {
     // Предотвращаем множественные вызовы
     if (!isModalOpen) return;
+    
+    // Определяем, является ли текущий маршрут страницей поста
+    const isPostPage = location.pathname.startsWith('/post/');
+    
     // Закрываем модальное окно
     closeModal();
-    // Удаляю автоматический переход на главную, чтобы не мешать переходу на профиль
-    // if (isPostPage && !isHomePage && !isNotificationsPage) {
-    //   setTimeout(() => {
-    //     navigate('/', { replace: true });
-    //   }, 100);
-    // }
+    
+    // Если мы на странице поста, возвращаемся на предыдущую страницу
+    // чтобы избежать пустого экрана
+    if (isPostPage) {
+      setTimeout(() => {
+        navigate(-1); // Возвращаемся на один шаг назад
+      }, 100);
+    }
   };
 
   const handleLikeUpdate = (postId: string, hasLiked: boolean, likesCount: number) => {

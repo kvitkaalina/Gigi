@@ -12,60 +12,45 @@
 }
 
 .modalContent {
-  background-color: white;
-  padding: 16px;
-  border-radius: 12px;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
   width: 90%;
   max-width: 400px;
   text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .modalContent h3 {
-  margin: 0 0 1rem;
-  font-size: 1.5rem;
+  font-size: 22px;
+  font-weight: 600;
   color: #262626;
+  margin: 0 0 12px;
 }
 
 .modalContent p {
-  margin: 0 0 1.5rem;
   color: #8e8e8e;
+  font-size: 15px;
   line-height: 1.5;
+  margin: 0 0 24px;
 }
 
 .buttonGroup {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: center;
 }
 
-.button, .deleteButton, .cancelButton {
+.button {
+  width: 100%;
+  padding: 12px;
+  border: none;
   border-radius: 8px;
-  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.1s;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-}
-
-.button:hover, .deleteButton:hover, .cancelButton:hover {
-  filter: brightness(0.97);
-  box-shadow: 0 2px 8px rgba(58, 94, 99, 0.08);
-  transform: translateY(-1px);
-}
-
-.button:active, .deleteButton:active, .cancelButton:active {
-  transform: scale(0.98);
-  box-shadow: none;
-}
-
-.button:focus-visible, .deleteButton:focus-visible, .cancelButton:focus-visible {
-  outline: 2px solid #3a5e63;
-  outline-offset: 2px;
-}
-
-.button:disabled, .deleteButton:disabled, .cancelButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  box-shadow: none;
-  filter: none;
-  transform: none;
+  transition: all 0.2s ease;
 }
 
 .deleteButton {
@@ -75,13 +60,20 @@
 
 .deleteButton:hover {
   background-color: #c71f2d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(237, 73, 86, 0.3);
 }
 
 .cancelButton {
   background-color: #efefef;
   color: #262626;
+  border: 1px solid #dbdbdb;
 }
 
 .cancelButton:hover {
-  background-color: #dbdbdb;
+  background-color: #e2e2e2;
+}
+
+.button:active {
+  transform: scale(0.98);
 } 
